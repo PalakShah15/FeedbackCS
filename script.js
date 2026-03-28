@@ -392,71 +392,191 @@ document.querySelectorAll(".feedback-form").forEach(form => {
 /* ===== ADMIN TABLE LOGIC ===== */
 const adminTableBody = document.getElementById("adminTable");
 
-if (adminTableBody) {
-    const feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+// Renders any subset of feedback data into the admin table
+function renderAdminTable(data) {
+    if (!adminTableBody) return;
 
-    if (feedbacks.length === 0) {
+    adminTableBody.innerHTML = "";
+
+    if (data.length === 0) {
         adminTableBody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align:center; padding:20px; color:#999;">
-                    No feedback submitted yet
+                <td colspan="7" style="text-align:center; padding:20px; color:#999;">
+                    No feedback found
                 </td>
             </tr>
         `;
-    } else {
-        feedbacks.forEach((feedback, index) => {
-            const row = document.createElement("tr");
-            row.style.animation = `fadeIn 0.5s ease ${index * 0.1}s both`;
-
-            // Field name mappings for better display
-            const fieldLabels = {
-                'serviceType': 'Service Type',
-                'staffBehaviour': 'Staff Behaviour',
-                'suggestions': 'Suggestions',
-                'productQuality': 'Product Quality',
-                'features': 'Features Used',
-                'comments': 'Comments',
-                'courseName': 'Course Name',
-                'instructorName': 'Instructor Name',
-                'difficultyLevel': 'Difficulty Level',
-                'contentQuality': 'Content Quality',
-                'feedback': 'Feedback',
-                'eventName': 'Event Name',
-                'eventType': 'Event Type',
-                'organization': 'Organization Quality',
-                'section': 'Website Section',
-                'ease': 'Ease of Use'
-            };
-
-            // Create data summary with proper labels (excluding type, date, rating, name, and email)
-            let dataSummary = [];
-            Object.keys(feedback).forEach(key => {
-                if (key !== 'type' && key !== 'date' && key !== 'rating' && key !== 'name' && key !== 'email') {
-                    const label = fieldLabels[key] || key.charAt(0).toUpperCase() + key.slice(1);
-                    dataSummary.push(`<strong>${label}:</strong> ${feedback[key]}`);
-                }
-            });
-
-            row.innerHTML = `
-                <td style="text-align:center;">
-                    <input type="checkbox" class="row-select" data-index="${index}"
-                        style="transform:scale(1.2); cursor:pointer; accent-color:#4a63f3;">
-                </td>
-                <td style="font-weight:600; color:#4a63f3;">${feedback.type}</td>
-                <td style="font-weight:500;">${feedback.name || 'N/A'}</td>
-                <td style="font-size:14px;">${feedback.email || 'N/A'}</td>
-                <td style="max-width:350px; font-size:13px; line-height:1.6;">${dataSummary.join('<br>') || 'N/A'}</td>
-                <td style="white-space:nowrap;">
-                    <span style="color:gold; font-size:18px;">${'★'.repeat(feedback.rating || 0)}</span>
-                    <span style="color:#ddd; font-size:18px;">${'★'.repeat(5 - (feedback.rating || 0))}</span>
-                </td>
-                <td style="font-size:13px; color:#666; white-space:nowrap;">${feedback.date}</td>
-            `;
-
-            adminTableBody.appendChild(row);
-        });
+        return;
     }
+
+    data.forEach((feedback, index) => {
+        const row = document.createElement("tr");
+        row.style.animation = `fadeIn 0.5s ease ${index * 0.1}s both`;
+
+        // Field name mappings for better display
+        const fieldLabels = {
+            'serviceType': 'Service Type',
+            'staffBehaviour': 'Staff Behaviour',
+            'suggestions': 'Suggestions',
+            'productQuality': 'Product Quality',
+            'features': 'Features Used',
+            'comments': 'Comments',
+            'courseName': 'Course Name',
+            'instructorName': 'Instructor Name',
+            'difficultyLevel': 'Difficulty Level',
+            'contentQuality': 'Content Quality',
+            'feedback': 'Feedback',
+            'eventName': 'Event Name',
+            'eventType': 'Event Type',
+            'organization': 'Organization Quality',
+            'section': 'Website Section',
+            'ease': 'Ease of Use'
+        };
+
+        // Create data summary with proper labels (excluding type, date, rating, name, and email)
+        let dataSummary = [];
+        Object.keys(feedback).forEach(key => {
+            if (key !== 'type' && key !== 'date' && key !== 'rating' && key !== 'name' && key !== 'email') {
+                const label = fieldLabels[key] || key.charAt(0).toUpperCase() + key.slice(1);
+                dataSummary.push(`<strong>${label}:</strong> ${feedback[key]}`);
+            }
+        });
+
+        row.innerHTML = `
+            <td style="text-align:center;">
+                <input type="checkbox" class="row-select" data-index="${feedback._origIndex}"
+                    style="transform:scale(1.2); cursor:pointer; accent-color:#4a63f3;">
+            </td>
+            <td style="font-weight:600; color:#4a63f3;">${feedback.type}</td>
+            <td style="font-weight:500;">${feedback.name || 'N/A'}</td>
+            <td style="font-size:14px;">${feedback.email || 'N/A'}</td>
+            <td style="max-width:350px; font-size:13px; line-height:1.6;">${dataSummary.join('<br>') || 'N/A'}</td>
+            <td style="white-space:nowrap;">
+                <span style="color:gold; font-size:18px;">${'★'.repeat(feedback.rating || 0)}</span>
+                <span style="color:#ddd; font-size:18px;">${'★'.repeat(5 - (feedback.rating || 0))}</span>
+            </td>
+            <td style="font-size:13px; color:#666; white-space:nowrap;">${feedback.date}</td>
+        `;
+
+        adminTableBody.appendChild(row);
+    });
 }
+
+
+/* ===== FILTER LOGIC ===== */
+
+// Safely parse the date string stored by the app (toLocaleString format, e.g. "3/29/2026, 12:30:00 AM")
+// new Date() is unreliable on locale strings in all browsers, so we parse manually.
+function parseFeedbackDate(dateStr) {
+    if (!dateStr) return NaN;
+    // Try native parse first (works in most modern browsers for en-US locale strings)
+    const ts = Date.parse(dateStr);
+    if (!isNaN(ts)) return ts;
+    // Fallback: manually extract parts from "M/D/YYYY, H:MM:SS AM/PM" format
+    const match = dateStr.match(
+        /(\d{1,2})\/(\d{1,2})\/(\d{4}),?\s+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)?/i
+    );
+    if (!match) return NaN;
+    let [, month, day, year, hours, minutes, seconds, ampm] = match;
+    hours = parseInt(hours);
+    if (ampm) {
+        if (ampm.toUpperCase() === "PM" && hours !== 12) hours += 12;
+        if (ampm.toUpperCase() === "AM" && hours === 12) hours = 0;
+    }
+    return new Date(
+        parseInt(year), parseInt(month) - 1, parseInt(day),
+        hours, parseInt(minutes), parseInt(seconds)
+    ).getTime();
+}
+
+function applyFilters() {
+    if (!adminTableBody) return;
+
+    const allFeedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+
+    // Tag each entry with its original localStorage index (needed by export checkboxes)
+    const tagged = allFeedbacks.map((f, i) => ({ ...f, _origIndex: i }));
+
+    const dateVal   = document.getElementById("filterDate")   ? document.getElementById("filterDate").value   : "all";
+    const ratingVal = document.getElementById("filterRating") ? document.getElementById("filterRating").value : "all";
+    const searchVal = document.getElementById("filterSearch") ? document.getElementById("filterSearch").value.trim().toLowerCase() : "";
+
+    const now = Date.now();
+
+    const filtered = tagged.filter(f => {
+
+        // ── Date Range Filter ──────────────────────────────────────────────
+        // Uses parseFeedbackDate() to reliably handle toLocaleString() format
+        if (dateVal !== "all") {
+            const days      = parseInt(dateVal);
+            const cutoff    = now - days * 24 * 60 * 60 * 1000;
+            const entryTime = parseFeedbackDate(f.date);
+            if (isNaN(entryTime) || entryTime < cutoff) return false;
+        }
+
+        // ── Star Rating Filter ─────────────────────────────────────────────
+        if (ratingVal !== "all") {
+            if (String(f.rating) !== ratingVal) return false;
+        }
+
+        // ── Text Search Filter ─────────────────────────────────────────────
+        // Only scan actual text fields — exclude _origIndex (number) to avoid false hits
+        if (searchVal !== "") {
+            const TEXT_KEYS = ["name", "email", "type", "date",
+                "serviceType", "staffBehaviour", "suggestions",
+                "productQuality", "features", "comments",
+                "courseName", "instructorName", "difficultyLevel", "contentQuality",
+                "feedback", "eventName", "eventType", "organization",
+                "section", "ease"];
+            const searchable = TEXT_KEYS
+                .map(k => (f[k] || "").toString().toLowerCase())
+                .join(" ");
+            if (!searchable.includes(searchVal)) return false;
+        }
+
+        return true;
+    });
+
+    // Update result badge
+    const countEl = document.getElementById("filterResultCount");
+    if (countEl) {
+        countEl.textContent = filtered.length === allFeedbacks.length
+            ? `${allFeedbacks.length} entr${allFeedbacks.length === 1 ? "y" : "ies"}`
+            : `${filtered.length} of ${allFeedbacks.length} entr${allFeedbacks.length === 1 ? "y" : "ies"}`;
+    }
+
+    renderAdminTable(filtered);
+}
+
+// Resets all filter controls to defaults and re-renders the full table
+function resetFilters() {
+    const dateEl   = document.getElementById("filterDate");
+    const ratingEl = document.getElementById("filterRating");
+    const searchEl = document.getElementById("filterSearch");
+
+    if (dateEl)   dateEl.value   = "all";
+    if (ratingEl) ratingEl.value = "all";
+    if (searchEl) searchEl.value = "";
+
+    applyFilters();
+}
+
+
+/* ===== FILTER EVENT LISTENERS ===== */
+(function () {
+    const dateEl   = document.getElementById("filterDate");
+    const ratingEl = document.getElementById("filterRating");
+    const searchEl = document.getElementById("filterSearch");
+
+    if (dateEl)   dateEl.addEventListener("change", applyFilters);
+    if (ratingEl) ratingEl.addEventListener("change", applyFilters);
+    if (searchEl) searchEl.addEventListener("input",  applyFilters);
+
+    // Initial render (replaces the old static render on page load)
+    applyFilters();
+})();
+
+
 
 
 /* ===== ADMIN CHART LOGIC ===== */

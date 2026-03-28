@@ -8,6 +8,61 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: var(--card);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+        }
+        .filter-bar select,
+        .filter-bar input[type="text"] {
+            flex: 1;
+            min-width: 160px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            background: var(--card);
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 0;
+        }
+        .filter-bar select:focus,
+        .filter-bar input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(74,99,243,0.1);
+        }
+        .filter-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 160px;
+        }
+        #filterResultCount {
+            font-size: 13px;
+            color: var(--gray);
+            white-space: nowrap;
+            align-self: flex-end;
+            padding-bottom: 2px;
+        }
+    </style>
 </head>
 
 <body>
@@ -61,6 +116,43 @@
         <div class="chart-container">
             <canvas id="feedbackChart"></canvas>
         </div>
+
+
+        <!-- ===== FILTER BAR ===== -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label for="filterDate">📅 Date Range</label>
+                <select id="filterDate">
+                    <option value="all">All Time</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterRating">⭐ Star Rating</label>
+                <select id="filterRating">
+                    <option value="all">All Ratings</option>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterSearch">🔍 Search</label>
+                <input type="text" id="filterSearch"
+                    placeholder="Search by name, email, or feedback...">
+            </div>
+            <span id="filterResultCount"></span>
+            <button onclick="resetFilters()"
+                style="width:auto; padding:10px 18px; font-size:13px; margin-top:0;
+                       background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+                       align-self:flex-end;">
+                🔄 Reset Filters
+            </button>
+        </div>
+        <!-- ====================== -->
 
         <table class="admin-table">
             <thead>
