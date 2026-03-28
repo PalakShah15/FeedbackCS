@@ -99,6 +99,11 @@ document.querySelectorAll(".stars").forEach(starBox => {
             }
             // Update emoji reaction for this star widget
             updateEmojiReaction(i, reactionEl);
+            // Trigger bounce animation on clicked star
+            star.classList.remove('star-pop');
+            void star.offsetWidth; // force reflow so animation replays
+            star.classList.add('star-pop');
+            setTimeout(() => star.classList.remove('star-pop'), 300);
         };
 
         starBox.appendChild(star);
@@ -416,8 +421,14 @@ document.querySelectorAll(".feedback-form").forEach(form => {
             all.push(data);
             localStorage.setItem("feedbacks", JSON.stringify(all));
 
+            // Store last submission for user PDF download
+            lastSubmittedFeedback = data;
+
             // Show personalised thank-you toast (name already captured in data.name)
             showThankYouMessage(data.name);
+
+            // Show download button near the submit button
+            showDownloadButton(data, form);
 
             // Reset form
             form.reset();
@@ -440,6 +451,147 @@ document.querySelectorAll(".feedback-form").forEach(form => {
         return false;
     };
 });
+
+/* ===== USER PDF DOWNLOAD ===== */
+
+// Holds the most recently submitted feedback for PDF generation
+let lastSubmittedFeedback = null;
+
+// Lazy-load jsPDF from CDN if not already present, then run callback
+function loadJsPDF(callback) {
+    if (window.jspdf) { callback(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload  = callback;
+    s.onerror = () => console.warn('[PDF] Failed to load jsPDF CDN');
+    document.head.appendChild(s);
+}
+
+function generateUserPDF(feedback) {
+    loadJsPDF(() => {
+        const { jsPDF } = window.jspdf;
+        const doc        = new jsPDF();
+        const margin     = 18;
+        const pageW      = doc.internal.pageSize.getWidth();
+        const maxW       = pageW - margin * 2;
+        const lineH      = 8;
+        let y            = 24;
+
+        // Field label map (reuse same set as admin dashboard)
+        const fieldLabels = {
+            serviceType: 'Service Type', staffBehaviour: 'Staff Behaviour',
+            suggestions: 'Suggestions',  productQuality: 'Product Quality',
+            features: 'Features Used',   comments: 'Comments',
+            courseName: 'Course Name',   instructorName: 'Instructor Name',
+            difficultyLevel: 'Difficulty Level', contentQuality: 'Content Quality',
+            feedback: 'Feedback',        eventName: 'Event Name',
+            eventType: 'Event Type',     organization: 'Organization Quality',
+            section: 'Website Section',  ease: 'Ease of Use'
+        };
+
+        // Helper: add a line, create new page if needed
+        function addLine(text, isBold) {
+            if (y + lineH > doc.internal.pageSize.getHeight() - 20) {
+                doc.addPage(); y = 20;
+            }
+            if (isBold) doc.setFont('helvetica', 'bold');
+            else        doc.setFont('helvetica', 'normal');
+            doc.text(text, margin, y);
+            y += lineH;
+        }
+
+        // Helper: wrapped text block (for long textarea values)
+        function addWrapped(label, value) {
+            if (!value) return;
+            const lines = doc.splitTextToSize(`${label}: ${value}`, maxW);
+            lines.forEach((ln, idx) => addLine(ln, idx === 0));
+            y += 2;
+        }
+
+        // ── Title ──
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Your Feedback Submission', pageW / 2, y, { align: 'center' });
+        y += 12;
+
+        // ── Divider ──
+        doc.setDrawColor(74, 99, 243);
+        doc.setLineWidth(0.8);
+        doc.line(margin, y, pageW - margin, y);
+        y += 10;
+
+        // ── Core fields ──
+        doc.setFontSize(11);
+        addLine(`Name   : ${feedback.name   || 'N/A'}`, false);
+        addLine(`Email  : ${feedback.email  || 'N/A'}`, false);
+        addLine(`Type   : ${feedback.type   || 'N/A'}`, false);
+        addLine(`Rating : ${feedback.rating || 0}/5`,   false);
+        addLine(`Date   : ${feedback.date   || 'N/A'}`, false);
+        if (feedback.sentiment) {
+            addLine(`Sentiment : ${feedback.sentiment}`, false);
+        }
+        y += 4;
+
+        // ── Form-specific fields (with wrapping) ──
+        const SKIP = new Set(['name','email','type','rating','date','sentiment','_origIndex']);
+        Object.keys(feedback).forEach(key => {
+            if (SKIP.has(key)) return;
+            const label = fieldLabels[key] || (key.charAt(0).toUpperCase() + key.slice(1));
+            addWrapped(label, feedback[key]);
+        });
+
+        // ── Footer ──
+        y += 4;
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.4);
+        doc.line(margin, y, pageW - margin, y);
+        y += 6;
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(150);
+        doc.text('Generated by Feedback Hub · Cyber Flames © 2026', pageW / 2, y, { align: 'center' });
+
+        // ── Save ──
+        const safeName = (feedback.name || 'user').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        doc.save(`feedback-${safeName}.pdf`);
+    });
+}
+
+// Creates (or replaces) a download button below the form's submit button
+function showDownloadButton(feedbackData, form) {
+    // Remove any previous download button for this form
+    const prev = form.querySelector('.user-pdf-btn');
+    if (prev) prev.remove();
+
+    const btn = document.createElement('button');
+    btn.type      = 'button';
+    btn.className = 'user-pdf-btn';
+    btn.innerHTML = '📄 Download Your Response';
+    btn.style.cssText = `
+        margin-top: 12px;
+        background: linear-gradient(135deg, #4a63f3 0%, #3651d4 100%);
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    `;
+
+    btn.onclick = () => generateUserPDF(feedbackData);
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.insertAdjacentElement('afterend', btn);
+    } else {
+        form.appendChild(btn);
+    }
+
+    // Fade-in after one frame
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        btn.style.opacity   = '1';
+        btn.style.transform = 'translateY(0)';
+    }));
+}
+
+/* ============================= */
 
 
 /* ===== PERSONALISED THANK-YOU TOAST ===== */

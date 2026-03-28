@@ -633,3 +633,107 @@ html {
     background: white;
     outline: none;
 }
+
+
+/* =====================================================
+   MICRO-ANIMATION ENHANCEMENTS
+   Purely additive — overrides nothing, only upgrades
+   ===================================================== */
+
+/* ── Button: deeper lift + press feel ── */
+button {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.2s ease,
+                opacity 0.2s ease;
+    will-change: transform, box-shadow;
+}
+
+button:hover {
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 10px 28px rgba(74, 99, 243, 0.45);
+}
+
+button:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 8px rgba(74, 99, 243, 0.25);
+    transition-duration: 0.08s;
+}
+
+/* Disabled state — no lift */
+button:disabled {
+    transform: none !important;
+    box-shadow: none !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Star: hover glow + click bounce ── */
+@keyframes starPop {
+    0%   { transform: scale(1.2); }
+    40%  { transform: scale(1.5); }
+    70%  { transform: scale(0.95); }
+    100% { transform: scale(1.15); }
+}
+
+.stars span {
+    transition: color 0.18s ease,
+                transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+                filter 0.18s ease;
+    will-change: transform, color;
+}
+
+.stars span:hover {
+    transform: scale(1.25);
+    filter: drop-shadow(0 0 6px rgba(255, 200, 0, 0.6));
+}
+
+/* Triggered by JS on click: adds then removes this class */
+.stars span.star-pop {
+    animation: starPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Input / Select: focus lift ── */
+input[type="text"]:focus,
+input[type="email"]:focus,
+select:focus,
+textarea:focus {
+    transform: translateY(-1px);
+    transition: border-color 0.25s ease,
+                box-shadow   0.25s ease,
+                transform    0.25s ease;
+}
+
+/* ── Form container: subtle entrance for page load ── */
+.form-container {
+    animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Nav links: smoother hover ── */
+.nav-link {
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-link:hover {
+    transform: translateY(-2px);
+}
+
+/* ── Theme toggle: smoother spring spin ── */
+.theme-toggle {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.15) rotate(22deg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Reduce motion: respect user preference ── */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
