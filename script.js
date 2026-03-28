@@ -27,6 +27,46 @@ if (toggle) {
 }
 
 
+/* ===== EMOJI REACTION STYLES (injected once) ===== */
+(function injectEmojiStyles() {
+    if (document.getElementById('emojiReactionStyles')) return;
+    const s = document.createElement('style');
+    s.id = 'emojiReactionStyles';
+    s.textContent = `
+        .emoji-reaction {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0 12px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: rgba(74, 99, 243, 0.07);
+            border-left: 4px solid var(--primary, #4a63f3);
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            pointer-events: none;
+        }
+        .emoji-reaction.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .emoji-reaction .er-emoji {
+            font-size: 28px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .emoji-reaction .er-msg {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text, #2c3e50);
+        }
+    `;
+    document.head.appendChild(s);
+})();
+
+
 /* ========= STAR RATING (FIXED & ANIMATED) ========= */
 document.querySelectorAll(".stars").forEach(starBox => {
     let selectedRating = 0;
@@ -57,6 +97,8 @@ document.querySelectorAll(".stars").forEach(starBox => {
             if (errorEl && errorEl.classList.contains('error')) {
                 errorEl.textContent = "";
             }
+            // Update emoji reaction for this star widget
+            updateEmojiReaction(i, reactionEl);
         };
 
         starBox.appendChild(star);
@@ -73,8 +115,43 @@ document.querySelectorAll(".stars").forEach(starBox => {
             }
         });
     }
+
+    // Inject the emoji reaction container after the error <small> that follows .stars
+    const errorSmall = starBox.nextElementSibling;
+    const reactionEl = document.createElement('div');
+    reactionEl.className = 'emoji-reaction';
+    reactionEl.innerHTML = '<span class="er-emoji"></span><span class="er-msg"></span>';
+    if (errorSmall && errorSmall.tagName === 'SMALL') {
+        errorSmall.insertAdjacentElement('afterend', reactionEl);
+    } else {
+        starBox.insertAdjacentElement('afterend', reactionEl);
+    }
 });
 
+
+/* ========= EMOJI REACTION FUNCTION ========= */
+
+const EMOJI_REACTIONS = {
+    5: { emoji: '😍', msg: "We’re glad you loved it!" },
+    4: { emoji: '😊', msg: "Thanks! We’re happy you liked it!" },
+    3: { emoji: '🙂', msg: "Thanks! We’ll try to improve." },
+    2: { emoji: '😕', msg: "We’re sorry, tell us what went wrong." },
+    1: { emoji: '😡', msg: "We’re really sorry! Your feedback matters." }
+};
+
+function updateEmojiReaction(rating, container) {
+    const reaction = EMOJI_REACTIONS[rating];
+    if (!reaction || !container) return;
+    container.querySelector('.er-emoji').textContent = reaction.emoji;
+    container.querySelector('.er-msg').textContent   = reaction.msg;
+    // Trigger animation: remove then re-add .show on next frame
+    container.classList.remove('show');
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => container.classList.add('show'));
+    });
+}
+
+/* =========================================== */
 
 /* ========= FORM VALIDATION + SAVE ========= */
 document.querySelectorAll(".feedback-form").forEach(form => {
@@ -324,69 +401,152 @@ document.querySelectorAll(".feedback-form").forEach(form => {
             }
         }
 
-        // All validation passed - save to localStorage
-        const all = JSON.parse(localStorage.getItem("feedbacks")) || [];
-        all.push(data);
-        localStorage.setItem("feedbacks", JSON.stringify(all));
+        // All validation passed — run sentiment analysis then save
+        form.querySelector('button[type="submit"]').disabled = true;
 
-        // Show success message
-        const successDiv = document.createElement('div');
-        successDiv.style.cssText = `
-            position: fixed;
-            top: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-            font-size: 18px;
-            font-weight: 600;
-            animation: slideDown 0.5s ease;
-        `;
-        successDiv.textContent = '✅ Feedback submitted successfully!';
-        document.body.appendChild(successDiv);
+        // Collect all textarea text for sentiment analysis
+        const textForSentiment = [...form.querySelectorAll('textarea')]
+            .map(t => t.value.trim()).join(' ');
 
-        // Add animation
-        if (!document.getElementById('slideDownAnimation')) {
-            const style = document.createElement('style');
-            style.id = 'slideDownAnimation';
-            style.textContent = `
-                @keyframes slideDown {
-                    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-                    to { opacity: 1; transform: translateX(-50%) translateY(0); }
-                }
+        getSentimentHybrid(textForSentiment).then(sentiment => {
+            data.sentiment = sentiment;
+
+            // Save to localStorage
+            const all = JSON.parse(localStorage.getItem("feedbacks")) || [];
+            all.push(data);
+            localStorage.setItem("feedbacks", JSON.stringify(all));
+
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+                color: white;
+                padding: 20px 40px;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 10000;
+                font-size: 18px;
+                font-weight: 600;
+                animation: slideDown 0.5s ease;
             `;
-            document.head.appendChild(style);
-        }
+            successDiv.textContent = '\u2705 Feedback submitted successfully!';
+            document.body.appendChild(successDiv);
 
-        // Remove success message after 3 seconds
-        setTimeout(() => {
-            successDiv.style.transition = 'opacity 0.5s ease';
-            successDiv.style.opacity = '0';
-            setTimeout(() => successDiv.remove(), 500);
-        }, 3000);
+            // Add animation
+            if (!document.getElementById('slideDownAnimation')) {
+                const style = document.createElement('style');
+                style.id = 'slideDownAnimation';
+                style.textContent = `
+                    @keyframes slideDown {
+                        from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+                        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
 
-        // Reset form
-        form.reset();
+            // Remove success message after 3 seconds
+            setTimeout(() => {
+                successDiv.style.transition = 'opacity 0.5s ease';
+                successDiv.style.opacity = '0';
+                setTimeout(() => successDiv.remove(), 500);
+            }, 3000);
 
-        // Reset star rating
-        if (starBox) {
-            starBox.setAttribute('data-rating', '0');
-            [...starBox.children].forEach(star => {
-                star.style.color = "#ddd";
-                star.style.transform = "scale(1)";
-            });
-        }
+            // Reset form
+            form.reset();
 
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Reset star rating
+            if (starBox) {
+                starBox.setAttribute('data-rating', '0');
+                [...starBox.children].forEach(star => {
+                    star.style.color = "#ddd";
+                    star.style.transform = "scale(1)";
+                });
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            form.querySelector('button[type="submit"]').disabled = false;
+        });
 
         return false;
     };
 });
+
+
+
+/* ===== SENTIMENT ANALYSIS ===== */
+
+// Rule-based sentiment using keyword matching (fast, local, no API needed)
+function ruleBasedSentiment(text) {
+    const POSITIVE_WORDS = [
+        "good", "great", "excellent", "amazing", "fantastic", "fast", "love",
+        "nice", "awesome", "wonderful", "helpful", "outstanding", "perfect",
+        "happy", "satisfied", "impressive", "clean", "easy", "smooth", "best"
+    ];
+    const NEGATIVE_WORDS = [
+        "bad", "poor", "slow", "worst", "hate", "issue", "problem", "terrible",
+        "awful", "horrible", "disappointing", "broken", "useless", "difficult",
+        "wrong", "fail", "failed", "ugly", "frustrating", "confusing", "error"
+    ];
+
+    const lower = text.toLowerCase();
+    const words = lower.match(/\b\w+\b/g) || [];
+
+    let pos = 0, neg = 0;
+    words.forEach(w => {
+        if (POSITIVE_WORDS.includes(w)) pos++;
+        if (NEGATIVE_WORDS.includes(w)) neg++;
+    });
+
+    if (pos > neg)  return "Positive";
+    if (neg > pos)  return "Negative";
+    return "Neutral"; // equal or no matches → uncertain
+}
+
+// Hugging Face API fallback — called only when rule-based returns "Neutral"
+async function analyzeWithAPI(text) {
+    try {
+        const response = await fetch(
+            "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english",
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer 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",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ inputs: text })
+            }
+        );
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        const result = await response.json();
+        // Response shape: [[{label, score}, ...]]
+        const best = Array.isArray(result[0])
+            ? result[0].reduce((a, b) => (a.score > b.score ? a : b))
+            : result[0];
+        if (best.label === "POSITIVE") return "Positive";
+        if (best.label === "NEGATIVE") return "Negative";
+        return "Neutral";
+    } catch (err) {
+        console.warn("[Sentiment API] Failed, defaulting to Neutral:", err.message);
+        return "Neutral"; // safe fallback — never breaks submission
+    }
+}
+
+// Hybrid: rule-based first; API only if uncertain (Neutral)
+async function getSentimentHybrid(text) {
+    if (!text || text.trim() === "") return "Neutral";
+    const ruleBased = ruleBasedSentiment(text);
+    if (ruleBased !== "Neutral") return ruleBased;  // fast path
+    return await analyzeWithAPI(text);              // uncertain → ask AI
+}
+
+/* ============================== */
 
 
 /* ===== ADMIN TABLE LOGIC ===== */
@@ -442,6 +602,15 @@ function renderAdminTable(data) {
             }
         });
 
+        // Sentiment badge helper
+        const sentimentMap = {
+            "Positive": { emoji: "\uD83D\uDE0A", cls: "sentiment-positive" },
+            "Negative": { emoji: "\uD83D\uDE21", cls: "sentiment-negative" },
+            "Neutral":  { emoji: "\uD83D\uDE10", cls: "sentiment-neutral"  }
+        };
+        const sLabel = feedback.sentiment || "Neutral";
+        const sInfo  = sentimentMap[sLabel] || sentimentMap["Neutral"];
+
         row.innerHTML = `
             <td style="text-align:center;">
                 <input type="checkbox" class="row-select" data-index="${feedback._origIndex}"
@@ -452,8 +621,11 @@ function renderAdminTable(data) {
             <td style="font-size:14px;">${feedback.email || 'N/A'}</td>
             <td style="max-width:350px; font-size:13px; line-height:1.6;">${dataSummary.join('<br>') || 'N/A'}</td>
             <td style="white-space:nowrap;">
-                <span style="color:gold; font-size:18px;">${'★'.repeat(feedback.rating || 0)}</span>
-                <span style="color:#ddd; font-size:18px;">${'★'.repeat(5 - (feedback.rating || 0))}</span>
+                <span style="color:gold; font-size:18px;">${'\u2605'.repeat(feedback.rating || 0)}</span>
+                <span style="color:#ddd; font-size:18px;">${'\u2605'.repeat(5 - (feedback.rating || 0))}</span>
+            </td>
+            <td class="${sInfo.cls}" style="white-space:nowrap; font-size:14px;">
+                ${sInfo.emoji} ${sLabel}
             </td>
             <td style="font-size:13px; color:#666; white-space:nowrap;">${feedback.date}</td>
         `;
