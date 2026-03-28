@@ -416,45 +416,8 @@ document.querySelectorAll(".feedback-form").forEach(form => {
             all.push(data);
             localStorage.setItem("feedbacks", JSON.stringify(all));
 
-            // Show success message
-            const successDiv = document.createElement('div');
-            successDiv.style.cssText = `
-                position: fixed;
-                top: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-                color: white;
-                padding: 20px 40px;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                z-index: 10000;
-                font-size: 18px;
-                font-weight: 600;
-                animation: slideDown 0.5s ease;
-            `;
-            successDiv.textContent = '\u2705 Feedback submitted successfully!';
-            document.body.appendChild(successDiv);
-
-            // Add animation
-            if (!document.getElementById('slideDownAnimation')) {
-                const style = document.createElement('style');
-                style.id = 'slideDownAnimation';
-                style.textContent = `
-                    @keyframes slideDown {
-                        from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-                        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-
-            // Remove success message after 3 seconds
-            setTimeout(() => {
-                successDiv.style.transition = 'opacity 0.5s ease';
-                successDiv.style.opacity = '0';
-                setTimeout(() => successDiv.remove(), 500);
-            }, 3000);
+            // Show personalised thank-you toast (name already captured in data.name)
+            showThankYouMessage(data.name);
 
             // Reset form
             form.reset();
@@ -479,8 +442,78 @@ document.querySelectorAll(".feedback-form").forEach(form => {
 });
 
 
+/* ===== PERSONALISED THANK-YOU TOAST ===== */
 
-/* ===== SENTIMENT ANALYSIS ===== */
+// Inject CSS once
+(function injectThankYouStyles() {
+    if (document.getElementById('thankYouStyles')) return;
+    const s = document.createElement('style');
+    s.id = 'thankYouStyles';
+    s.textContent = `
+        @keyframes tySlideDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-24px) scale(0.96); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0)   scale(1);    }
+        }
+        .ty-toast {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 18px 36px;
+            border-radius: 16px;
+            box-shadow: 0 12px 35px rgba(46, 204, 113, 0.45);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-align: center;
+            animation: tySlideDown 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            max-width: 90vw;
+        }
+        .ty-toast .ty-main {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+        .ty-toast .ty-sub {
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.88;
+        }
+    `;
+    document.head.appendChild(s);
+})();
+
+function showThankYouMessage(name) {
+    const displayName = (name && name.trim()) ? name.trim() : null;
+    const mainText = displayName
+        ? `🙌 Thanks, ${displayName}! Your feedback really helps us improve.`
+        : `🙌 Thank you! Your feedback really helps us improve.`;
+
+    const toast = document.createElement('div');
+    toast.className = 'ty-toast';
+    toast.innerHTML = `
+        <span class="ty-main">${mainText}</span>
+        <span class="ty-sub">We appreciate you taking the time ❤️</span>
+    `;
+    document.body.appendChild(toast);
+
+    // Auto-dismiss after 3.5 s
+    setTimeout(() => {
+        toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        toast.style.opacity    = '0';
+        toast.style.transform  = 'translateX(-50%) translateY(-10px)';
+        setTimeout(() => toast.remove(), 500);
+    }, 3500);
+}
+
+/* ======================================== */
+
+
+
 
 // Rule-based sentiment using keyword matching (fast, local, no API needed)
 function ruleBasedSentiment(text) {
