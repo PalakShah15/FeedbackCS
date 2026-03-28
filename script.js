@@ -438,6 +438,10 @@ if (adminTableBody) {
             });
 
             row.innerHTML = `
+                <td style="text-align:center;">
+                    <input type="checkbox" class="row-select" data-index="${index}"
+                        style="transform:scale(1.2); cursor:pointer; accent-color:#4a63f3;">
+                </td>
                 <td style="font-weight:600; color:#4a63f3;">${feedback.type}</td>
                 <td style="font-weight:500;">${feedback.name || 'N/A'}</td>
                 <td style="font-size:14px;">${feedback.email || 'N/A'}</td>
@@ -560,6 +564,97 @@ function logout() {
     }
 
 }
+
+// --- SELECT ALL CHECKBOX ---
+const selectAllCheckbox = document.getElementById("selectAll");
+if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener("change", function () {
+        document.querySelectorAll(".row-select").forEach(cb => {
+            cb.checked = this.checked;
+        });
+    });
+}
+// ----------------------------
+
+
+/* ===== EXPORT HELPERS ===== */
+
+// Returns selected feedback entries, or ALL if none are checked
+function getSelectedFeedbacks() {
+    const feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+    const checked   = document.querySelectorAll(".row-select:checked");
+    if (checked.length === 0) return feedbacks;
+    return Array.from(checked).map(cb => feedbacks[parseInt(cb.dataset.index)]);
+}
+
+// Export selected (or all) feedback as a CSV file
+function exportCSV() {
+    const data = getSelectedFeedbacks();
+    if (data.length === 0) { alert("No feedback data to export."); return; }
+
+    const headers = ["Type", "Name", "Email", "Rating", "Date"];
+    const rows    = data.map(f => [
+        f.type   || "",
+        f.name   || "",
+        f.email  || "",
+        f.rating || "",
+        f.date   || ""
+    ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(","));
+
+    const csv  = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = "feedbacks.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Export selected (or all) feedback as a PDF file using jsPDF
+function exportPDF() {
+    const data = getSelectedFeedbacks();
+    if (data.length === 0) { alert("No feedback data to export."); return; }
+
+    const { jsPDF }    = window.jspdf;
+    const doc          = new jsPDF();
+    const pageHeight   = doc.internal.pageSize.height;
+    const lineH        = 7;
+
+    // Title
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Feedback Report", 105, 20, { align: "center" });
+
+    let y = 35;
+
+    data.forEach((f, i) => {
+        // Add a new page if remaining space is insufficient
+        if (y + 45 > pageHeight - 20) { doc.addPage(); y = 20; }
+
+        // Entry heading
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${i + 1}. ${f.type || "N/A"} Feedback`, 14, y);
+        y += lineH;
+
+        // Entry fields
+        doc.setFont("helvetica", "normal");
+        doc.text(`Name   : ${f.name   || "N/A"}`, 18, y); y += lineH;
+        doc.text(`Email  : ${f.email  || "N/A"}`, 18, y); y += lineH;
+        doc.text(`Rating : ${f.rating || 0}/5`,   18, y); y += lineH;
+        doc.text(`Date   : ${f.date   || "N/A"}`, 18, y); y += lineH + 3;
+
+        // Separator line
+        doc.setDrawColor(200, 200, 200);
+        doc.line(14, y, 196, y);
+        y += 5;
+    });
+
+    doc.save("feedbacks.pdf");
+}
+/* ========================== */
+
 
 // --- HIDDEN ADMIN ACCESS SYSTEM ---
 // Safely scoped to prevent variable conflicts
