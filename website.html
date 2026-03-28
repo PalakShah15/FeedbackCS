@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Feedback</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="brand">Feedback Hub</div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <!--<span class="nav-separator">|</span>
+         <a href="admin.html" class="nav-link">Admin Dashboard</a>-->
+        </div>
+
+        <div class="hamburger" onclick="openNav()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- ===== SIDE NAV ===== -->
+    <div id="sideNav" class="sidenav">
+        <span class="closebtn" onclick="closeNav()">&times;</span>
+
+        <a href="index.html">🏠 Home</a>
+        <!--<a href="admin.html">📊 Admin Dashboard</a>-->
+        <a href="service.html">📋 Service Feedback</a>
+        <a href="product.html">📦 Product Feedback</a>
+        <a href="training.html">🎓 Training & Course Feedback</a>
+        <a href="event.html">🎉 Event Feedback</a>
+        <a href="website.html">🌐 Website Feedback</a>
+    </div>
+
+    <div id="themeToggle" class="theme-toggle">🌙</div>
+
+    <div class="form-container">
+        <h2>Website Feedback Form</h2>
+
+        <form data-type="Website" class="feedback-form">
+            <label>Your Name</label>
+            <input type="text" name="name" required>
+            <small class="error"></small>
+
+            <label>Your Email</label>
+            <input type="email" name="email" required>
+            <small class="error"></small>
+
+            <label>Website Section</label>
+            <select name="section" required>
+                <option value="">Select</option>
+                <option>Home</option>
+                <option>Feedback Forms</option>
+                <option>Navigation</option>
+                <option>Overall Design</option>
+            </select>
+            <small class="error"></small>
+
+            <p class="section-label">Ease of Use</p>
+            <div class="option-group">
+                <div class="option-row">
+                    <input type="radio" id="ease-easy" name="ease" value="Easy" required>
+                    <label for="ease-easy">Easy</label>
+                </div>
+                <div class="option-row">
+                    <input type="radio" id="ease-moderate" name="ease" value="Moderate">
+                    <label for="ease-moderate">Moderate</label>
+                </div>
+                <div class="option-row">
+                    <input type="radio" id="ease-difficult" name="ease" value="Difficult">
+                    <label for="ease-difficult">Difficult</label>
+                </div>
+            </div>
+            <small class="error"></small>
+
+            <label>Overall Rating</label>
+            <div class="stars" data-rating="0"></div>
+            <small class="error"></small>
+
+            <label>Comments</label>
+            <textarea name="comments" required></textarea>
+            <small class="error"></small>
+
+            <button type="submit">Submit Feedback</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

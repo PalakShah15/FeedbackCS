@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <script>
+        if (localStorage.getItem("isAdmin") !== "true") {
+            window.location.href = "secure-access.html";
+        }
+    </script>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="brand">Feedback Hub</div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <span class="nav-separator">|</span>
+            <a href="admin.html" class="nav-link">Admin Dashboard</a>
+        </div>
+
+        <!--<button onclick="logout()" style="width:auto;padding:8px 16px;margin-left:20px;">
+        Logout
+    </button>-->
+        <a href="#" class="nav-link" onclick="logout()">Logout</a>
+
+
+
+        <div class="hamburger" onclick="openNav()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- ===== SIDE NAV ===== -->
+    <div id="sideNav" class="sidenav">
+        <span class="closebtn" onclick="closeNav()">&times;</span>
+
+        <a href="index.html">🏠 Home</a>
+        <a href="admin.html">📊 Admin Dashboard</a>
+        <a href="service.html">📋 Service Feedback</a>
+        <a href="product.html">📦 Product Feedback</a>
+        <a href="training.html">🎓 Training & Course Feedback</a>
+        <a href="event.html">🎉 Event Feedback</a>
+        <a href="website.html">🌐 Website Feedback</a>
+    </div>
+
+    <div class="form-container" style="max-width: 1000px;">
+        <h2>📊 Admin Dashboard</h2>
+
+        <div class="chart-container">
+            <canvas id="feedbackChart"></canvas>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Data</th>
+                    <th>Rating</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="adminTable"></tbody>
+        </table>
+
+        <button onclick="clearFeedback()"
+            style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); margin-top: 20px;">
+            🗑️ Clear All Feedback
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

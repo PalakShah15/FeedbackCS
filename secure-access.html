@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body style="display:flex;justify-content:center;align-items:center;height:100vh;">
+
+<div class="form-container" style="max-width:400px;">
+<h2>Admin Login</h2>
+
+<input type="text" class="login-input" id="user" placeholder="Username">
+<input type="password" class="login-input" id="pass" placeholder="Password">
+
+<br><br>
+
+<button onclick="login()">Login</button>
+
+<p id="error" class="error"></p>
+</div>
+
+<script>
+
+function login(){
+
+    if(
+    document.getElementById("user").value === "admin"
+    &&
+    document.getElementById("pass").value === "4159"
+    ){
+    localStorage.setItem("isAdmin","true");
+    window.location.href="admin.html";
+    }
+    else{
+    document.getElementById("error").innerText="Invalid credentials";
+    }
+
+}
+
+</script>
+</body>
+</html>
