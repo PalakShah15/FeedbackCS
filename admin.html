@@ -66,6 +66,54 @@
         .sentiment-positive { color: #22c55e; font-weight: 700; }
         .sentiment-neutral  { color: #f59e0b; font-weight: 700; }
         .sentiment-negative { color: #ef4444; font-weight: 700; }
+
+        /* ===== NEGATIVE ALERT ===== */
+        .neg-alert {
+            display: none;
+            align-items: flex-start;
+            gap: 14px;
+            background: linear-gradient(135deg, #fff0f0 0%, #ffe5e5 100%);
+            border: 1.5px solid #f5a0a0;
+            border-left: 5px solid #e74c3c;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 18px rgba(231, 76, 60, 0.12);
+            animation: negAlertIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        .neg-alert.show { display: flex; }
+        @keyframes negAlertIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .neg-alert .na-icon  { font-size: 26px; line-height: 1; flex-shrink: 0; }
+        .neg-alert .na-body  { flex: 1; }
+        .neg-alert .na-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #c0392b;
+            margin-bottom: 3px;
+        }
+        .neg-alert .na-sub   { font-size: 13px; color: #7f1d1d; margin-bottom: 10px; }
+        .neg-alert .na-btn {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+            margin: 0;
+            width: auto;
+        }
+        .neg-alert .na-btn:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(192,57,43,0.35);
+        }
     </style>
 </head>
 
@@ -116,6 +164,17 @@
 
     <div class="form-container" style="max-width: 1000px;">
         <h2>📊 Admin Dashboard</h2>
+
+        <!-- ===== NEGATIVE FEEDBACK ALERT ===== -->
+        <div id="negativeAlert" class="neg-alert">
+            <span class="na-icon">🚨</span>
+            <div class="na-body">
+                <div class="na-title" id="negAlertTitle"></div>
+                <div class="na-sub">These users need immediate attention. Review and respond promptly.</div>
+                <button class="na-btn" onclick="viewNegativeIssues()">👁 View Issues</button>
+            </div>
+        </div>
+        <!-- ===================================== -->
 
         <div class="chart-container">
             <canvas id="feedbackChart"></canvas>

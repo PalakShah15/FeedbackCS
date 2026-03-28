@@ -903,6 +903,9 @@ function applyFilters() {
     }
 
     renderAdminTable(filtered);
+
+    // Refresh negative alert whenever the table re-renders
+    checkNegativeFeedback();
 }
 
 // Resets all filter controls to defaults and re-renders the full table
@@ -1167,4 +1170,64 @@ function exportPDF() {
 })();
 // ----------------------------------
 
+/* ===== NEGATIVE FEEDBACK ALERT ===== */
 
+/**
+ * A feedback is "negative" if rating <= 2 OR sentiment === "Negative".
+ * Shows/hides the alert div and updates its message count.
+ */
+function checkNegativeFeedback() {
+    const alertEl = document.getElementById('negativeAlert');
+    const titleEl = document.getElementById('negAlertTitle');
+    if (!alertEl || !titleEl) return; // not on admin page
+
+    const feedbacks     = JSON.parse(localStorage.getItem('feedbacks')) || [];
+    const negativeItems = feedbacks.filter(f =>
+        parseInt(f.rating) <= 2 || f.sentiment === 'Negative'
+    );
+    const count = negativeItems.length;
+
+    if (count > 0) {
+        titleEl.textContent = `Alert: ${count} user${count === 1 ? ' is' : 's are'} unhappy! Immediate attention needed.`;
+        alertEl.classList.add('show');
+    } else {
+        alertEl.classList.remove('show');
+    }
+}
+
+/**
+ * "View Issues" button handler.
+ * Applies rating=1 and rating=2 can't be combined in one dropdown,
+ * so we filter the table directly to show only negative entries.
+ */
+function viewNegativeIssues() {
+    const allFeedbacks = JSON.parse(localStorage.getItem('feedbacks')) || [];
+    const negatives    = allFeedbacks
+        .map((f, i) => ({ ...f, _origIndex: i }))
+        .filter(f => parseInt(f.rating) <= 2 || f.sentiment === 'Negative');
+
+    // Reset filter controls to default so the label stays accurate
+    const dateEl   = document.getElementById('filterDate');
+    const ratingEl = document.getElementById('filterRating');
+    const searchEl = document.getElementById('filterSearch');
+    if (dateEl)   dateEl.value   = 'all';
+    if (ratingEl) ratingEl.value = 'all';
+    if (searchEl) searchEl.value = '';
+
+    // Update result count badge
+    const countEl = document.getElementById('filterResultCount');
+    if (countEl) {
+        countEl.textContent = negatives.length === allFeedbacks.length
+            ? `${allFeedbacks.length} entries`
+            : `${negatives.length} of ${allFeedbacks.length} entries (negative only)`;
+    }
+
+    // Render only negative entries (does NOT call applyFilters to avoid loop)
+    renderAdminTable(negatives);
+
+    // Scroll table into view
+    const tableEl = document.querySelector('.admin-table');
+    if (tableEl) tableEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ==================================== */
