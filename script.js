@@ -566,29 +566,32 @@ function logout() {
 (function () {
     const adminTrigger = document.getElementById("adminTrigger");
 
-    // Null check: Ensure no runtime errors if the element is missing horizontally on other pages
-    if (adminTrigger) {
-        let clickCount = 0;
-        let clickTimer = null;
+    // Null check: no runtime errors if element is absent on other pages
+    if (!adminTrigger) return;
 
-        adminTrigger.addEventListener("click", function () {
-            clickCount++;
+    let clickCount = 0;
+    let clickTimer = null;
 
-            if (clickCount === 1) {
-                // Start a 3-second timer reset on the first click
-                clickTimer = setTimeout(() => {
-                    clickCount = 0; // Reset counter gracefully after time expires
-                }, 3000);
-            }
+    adminTrigger.addEventListener("click", function () {
+        clickCount++;
 
-            if (clickCount >= 5) {
-                // Clear timer and execute secure redirection upon reaching 5 clicks
-                clearTimeout(clickTimer);
-                clickCount = 0;
-                window.location.href = "secure-access.html";
-            }
-        });
-    }
+        // Requirement 4 & 5: Start timer ONLY on first click; prevent stacking timers
+        if (clickCount === 1) {
+            clearTimeout(clickTimer); // Safety: clear any stale timer before starting
+            clickTimer = setTimeout(function () {
+                clickCount = 0;  // Requirement 2: auto-reset if 5 clicks not reached in time
+                clickTimer = null;
+            }, 3000);
+        }
+
+        // Requirement 1 & 3: Redirect on 5th click; reset all state after success
+        if (clickCount >= 5) {
+            clearTimeout(clickTimer); // Requirement 5: stop the running timer
+            clickTimer = null;
+            clickCount = 0;          // Requirement 3: reset counter after redirection
+            window.location.href = "secure-access.html";
+        }
+    });
 })();
 // ----------------------------------
 
