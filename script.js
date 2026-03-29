@@ -667,7 +667,7 @@ function showThankYouMessage(name) {
 
 
 
-// Rule-based sentiment using keyword matching (fast, local, no API needed)
+// Rule-based sentiment using keyword matching with negation handling
 function ruleBasedSentiment(text) {
     const POSITIVE_WORDS = [
         "good", "great", "excellent", "amazing", "fantastic", "fast", "love",
@@ -679,19 +679,34 @@ function ruleBasedSentiment(text) {
         "awful", "horrible", "disappointing", "broken", "useless", "difficult",
         "wrong", "fail", "failed", "ugly", "frustrating", "confusing", "error"
     ];
+    // Negators: if the word before a positive word is one of these,
+    // the whole phrase flips to negative (e.g. "not good", "never great")
+    const NEGATORS = new Set([
+        "not", "no", "never", "don't", "dont", "doesn't", "doesnt",
+        "isn't", "isnt", "wasn't", "wasnt", "without", "hardly", "barely"
+    ]);
 
     const lower = text.toLowerCase();
-    const words = lower.match(/\b\w+\b/g) || [];
+    const words = lower.match(/\b[\w']+\b/g) || [];
 
     let pos = 0, neg = 0;
-    words.forEach(w => {
-        if (POSITIVE_WORDS.includes(w)) pos++;
-        if (NEGATIVE_WORDS.includes(w)) neg++;
+    words.forEach((w, i) => {
+        const prev = i > 0 ? words[i - 1] : "";
+        const negated = NEGATORS.has(prev);
+
+        if (POSITIVE_WORDS.includes(w)) {
+            if (negated) neg++;   // "not good" → negative
+            else         pos++;
+        }
+        if (NEGATIVE_WORDS.includes(w)) {
+            if (negated) pos++;   // "not bad" → positive
+            else         neg++;
+        }
     });
 
     if (pos > neg)  return "Positive";
     if (neg > pos)  return "Negative";
-    return "Neutral"; // equal or no matches → uncertain
+    return "Neutral"; // equal or no matches → let API decide
 }
 
 // Hugging Face API fallback — called only when rule-based returns "Neutral"
@@ -778,13 +793,14 @@ function renderAdminTable(data) {
             'ease': 'Ease of Use'
         };
 
-        // Create data summary with proper labels (excluding type, date, rating, name, and email)
+        // Create data summary with proper labels
+        // Excludes internal/meta fields that should not be displayed
+        const DISPLAY_SKIP = new Set(['type','date','rating','name','email','sentiment','_origIndex']);
         let dataSummary = [];
         Object.keys(feedback).forEach(key => {
-            if (key !== 'type' && key !== 'date' && key !== 'rating' && key !== 'name' && key !== 'email') {
-                const label = fieldLabels[key] || key.charAt(0).toUpperCase() + key.slice(1);
-                dataSummary.push(`<strong>${label}:</strong> ${feedback[key]}`);
-            }
+            if (DISPLAY_SKIP.has(key)) return;
+            const label = fieldLabels[key] || key.charAt(0).toUpperCase() + key.slice(1);
+            dataSummary.push(`<strong>${label}:</strong> ${feedback[key]}`);
         });
 
         // Sentiment badge helper
