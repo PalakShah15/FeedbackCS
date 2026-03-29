@@ -180,7 +180,7 @@ body {
 /* ===== HERO SECTION ===== */
 .hero {
     min-height: calc(100vh - 140px);
-    background: linear-gradient(135deg, rgba(74, 99, 243, 0.9) 0%, rgba(52, 74, 217, 0.9) 100%),
+    background: linear-gradient(135deg, rgba(88, 110, 234, 0.9) 0%, rgba(71, 88, 202, 0.9) 100%),
         url("https://i.pinimg.com/736x/9b/f3/80/9bf380e08b5d18ba2215cb7dd5139e03.jpg");
     background-size: cover;
     background-position: center;
@@ -646,8 +646,8 @@ html {
 /* ── Button: deeper lift + press feel ── */
 button {
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-                box-shadow 0.2s ease,
-                opacity 0.2s ease;
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
     will-change: transform, box-shadow;
 }
 
@@ -672,16 +672,27 @@ button:disabled {
 
 /* ── Star: hover glow + click bounce ── */
 @keyframes starPop {
-    0%   { transform: scale(1.2); }
-    40%  { transform: scale(1.5); }
-    70%  { transform: scale(0.95); }
-    100% { transform: scale(1.15); }
+    0% {
+        transform: scale(1.2);
+    }
+
+    40% {
+        transform: scale(1.5);
+    }
+
+    70% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        transform: scale(1.15);
+    }
 }
 
 .stars span {
     transition: color 0.18s ease,
-                transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
-                filter 0.18s ease;
+        transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+        filter 0.18s ease;
     will-change: transform, color;
 }
 
@@ -702,8 +713,8 @@ select:focus,
 textarea:focus {
     transform: translateY(-1px);
     transition: border-color 0.25s ease,
-                box-shadow   0.25s ease,
-                transform    0.25s ease;
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
 }
 
 /* ── Form container: subtle entrance for page load ── */
@@ -723,7 +734,7 @@ textarea:focus {
 /* ── Theme toggle: smoother spring spin ── */
 .theme-toggle {
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                box-shadow 0.3s ease;
+        box-shadow 0.3s ease;
 }
 
 .theme-toggle:hover {
@@ -733,6 +744,7 @@ textarea:focus {
 
 /* ── Reduce motion: respect user preference ── */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -795,6 +807,7 @@ textarea:focus {
 body.dark .summary-box {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
+
 /* ============================== */
 
 /* ===== SENTIMENT PIE CHART ===== */
@@ -832,6 +845,7 @@ body.dark .summary-box {
     padding: 20px 0;
     margin: 0;
 }
+
 /* ================================= */
 
 /* ===== SMART DYNAMIC PLACEHOLDER ===== */
@@ -846,4 +860,5 @@ body.dark .summary-box {
 .feedback-form textarea.ph-fade::placeholder {
     opacity: 0;
 }
-/* ======================================= */
+
+/* ======================================= */
