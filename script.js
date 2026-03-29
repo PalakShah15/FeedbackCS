@@ -661,7 +661,6 @@ function showDownloadButton(feedbackData, form) {
 const APPRECIATION_MESSAGES = [
     "You're awesome! 🙌",
     "Thanks for helping us grow 🚀",
-    "We appreciate your time 💙",
     "Your feedback makes a difference 🌟",
     "You just made us better 😄",
     "Thanks for sharing your thoughts 🙏"
