@@ -658,11 +658,26 @@ function showDownloadButton(feedbackData, form) {
     document.head.appendChild(s);
 })();
 
+const APPRECIATION_MESSAGES = [
+    "You're awesome! 🙌",
+    "Thanks for helping us grow 🚀",
+    "We appreciate your time 💙",
+    "Your feedback makes a difference 🌟",
+    "You just made us better 😄",
+    "Thanks for sharing your thoughts 🙏"
+];
+
+function getRandomMessage() {
+    return APPRECIATION_MESSAGES[Math.floor(Math.random() * APPRECIATION_MESSAGES.length)];
+}
+
 function showThankYouMessage(name, timeMessage = "") {
     const displayName = (name && name.trim()) ? name.trim() : null;
+    const randomMsg = getRandomMessage();
+
     const mainText = displayName
-        ? `🙌 Thanks, ${displayName}! Your feedback really helps us improve.`
-        : `🙌 Thank you! Your feedback really helps us improve.`;
+        ? `🙌 Thanks, ${displayName}! ${randomMsg}`
+        : `🙌 Thank you! ${randomMsg}`;
 
     const toast = document.createElement('div');
     toast.className = 'ty-toast';
@@ -1337,16 +1352,16 @@ function generateSmartSummary(feedbacks) {
 
     if (pos >= total * 0.5) {
         overallLabel = 'happy overall';
-        icon         = '🌟';
-        borderColor  = '#2ecc71';
+        icon = '🌟';
+        borderColor = '#2ecc71';
     } else if (neg >= total * 0.5) {
         overallLabel = 'mostly unhappy';
-        icon         = '⚠️';
-        borderColor  = '#e74c3c';
+        icon = '⚠️';
+        borderColor = '#e74c3c';
     } else {
         overallLabel = 'mixed opinions';
-        icon         = '💡';
-        borderColor  = '#f39c12';
+        icon = '💡';
+        borderColor = '#f39c12';
     }
 
     // ── Find top keyword/topic ─────────────────────────────────────────────
@@ -1416,9 +1431,9 @@ function renderSentimentChart(feedbacks) {
     let pos = 0, neu = 0, neg = 0;
     feedbacks.forEach(f => {
         const s = (f.sentiment || 'Neutral').trim();
-        if (s === 'Positive')      pos++;
+        if (s === 'Positive') pos++;
         else if (s === 'Negative') neg++;
-        else                       neu++;
+        else neu++;
     });
 
     // ── Build Chart.js pie chart ───────────────────────────────────────────
@@ -1429,7 +1444,7 @@ function renderSentimentChart(feedbacks) {
             datasets: [{
                 data: [pos, neu, neg],
                 backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
-                borderColor:     ['#16a34a', '#d97706', '#dc2626'],
+                borderColor: ['#16a34a', '#d97706', '#dc2626'],
                 borderWidth: 2,
                 hoverOffset: 10
             }]
@@ -1439,32 +1454,32 @@ function renderSentimentChart(feedbacks) {
             maintainAspectRatio: true,
             animation: {
                 animateRotate: true,
-                animateScale:  true,
+                animateScale: true,
                 duration: 600,
                 easing: 'easeInOutQuart'
             },
             plugins: {
                 legend: {
-                    display:  true,
+                    display: true,
                     position: 'bottom',
                     labels: {
-                        padding:   20,
-                        font:      { size: 13, weight: '600' },
-                        boxWidth:  14,
+                        padding: 20,
+                        font: { size: 13, weight: '600' },
+                        boxWidth: 14,
                         boxHeight: 14
                     }
                 },
                 title: {
                     display: true,
-                    text:    'Sentiment Distribution',
-                    font:    { size: 16, weight: 'bold' },
+                    text: 'Sentiment Distribution',
+                    font: { size: 16, weight: 'bold' },
                     padding: { bottom: 16 }
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(ctx) {
+                        label: function (ctx) {
                             const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                            const pct   = total > 0
+                            const pct = total > 0
                                 ? ((ctx.parsed / total) * 100).toFixed(1)
                                 : 0;
                             return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
