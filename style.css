@@ -833,3 +833,17 @@ body.dark .summary-box {
     margin: 0;
 }
 /* ================================= */
+
+/* ===== SMART DYNAMIC PLACEHOLDER ===== */
+
+/* Smooth fade for placeholder text changes */
+.feedback-form textarea::placeholder {
+    transition: opacity 0.15s ease;
+    opacity: 1;
+}
+
+/* JS adds this class momentarily during the swap to create a fade effect */
+.feedback-form textarea.ph-fade::placeholder {
+    opacity: 0;
+}
+/* ======================================= */
