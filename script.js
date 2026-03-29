@@ -892,6 +892,7 @@ function applyFilters() {
 
     const dateVal = document.getElementById("filterDate") ? document.getElementById("filterDate").value : "all";
     const ratingVal = document.getElementById("filterRating") ? document.getElementById("filterRating").value : "all";
+    const sentimentVal = document.getElementById("filterSentiment") ? document.getElementById("filterSentiment").value : "all";
     const searchVal = document.getElementById("filterSearch") ? document.getElementById("filterSearch").value.trim().toLowerCase() : "";
 
     const now = Date.now();
@@ -910,6 +911,12 @@ function applyFilters() {
         // ── Star Rating Filter ─────────────────────────────────────────────
         if (ratingVal !== "all") {
             if (String(f.rating) !== ratingVal) return false;
+        }
+
+        // ── Sentiment Filter ───────────────────────────────────────────────
+        if (sentimentVal !== "all") {
+            const fbSentiment = f.sentiment || "Neutral";
+            if (fbSentiment !== sentimentVal) return false;
         }
 
         // ── Text Search Filter ─────────────────────────────────────────────
@@ -957,10 +964,12 @@ function applyFilters() {
 function resetFilters() {
     const dateEl = document.getElementById("filterDate");
     const ratingEl = document.getElementById("filterRating");
+    const sentimentEl = document.getElementById("filterSentiment");
     const searchEl = document.getElementById("filterSearch");
 
     if (dateEl) dateEl.value = "all";
     if (ratingEl) ratingEl.value = "all";
+    if (sentimentEl) sentimentEl.value = "all";
     if (searchEl) searchEl.value = "";
 
     applyFilters();
@@ -981,10 +990,12 @@ let _sentimentChartInstance = null;
 (function () {
     const dateEl = document.getElementById("filterDate");
     const ratingEl = document.getElementById("filterRating");
+    const sentimentEl = document.getElementById("filterSentiment");
     const searchEl = document.getElementById("filterSearch");
 
     if (dateEl) dateEl.addEventListener("change", applyFilters);
     if (ratingEl) ratingEl.addEventListener("change", applyFilters);
+    if (sentimentEl) sentimentEl.addEventListener("change", applyFilters);
     if (searchEl) searchEl.addEventListener("input", applyFilters);
 
     // Initial render (replaces the old static render on page load)
