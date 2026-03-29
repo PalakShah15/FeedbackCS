@@ -141,14 +141,14 @@ const EMOJI_REACTIONS = {
     4: { emoji: '😊', msg: "Thanks! We’re happy you liked it!" },
     3: { emoji: '🙂', msg: "Thanks! We’ll try to improve." },
     2: { emoji: '😕', msg: "We’re sorry, tell us what went wrong." },
-    1: { emoji: '😡', msg: "We’re really sorry! Your feedback matters." }
+    1: { emoji: '😔', msg: "We’re really sorry! Your feedback matters." }
 };
 
 function updateEmojiReaction(rating, container) {
     const reaction = EMOJI_REACTIONS[rating];
     if (!reaction || !container) return;
     container.querySelector('.er-emoji').textContent = reaction.emoji;
-    container.querySelector('.er-msg').textContent   = reaction.msg;
+    container.querySelector('.er-msg').textContent = reaction.msg;
     // Trigger animation: remove then re-add .show on next frame
     container.classList.remove('show');
     requestAnimationFrame(() => {
@@ -462,7 +462,7 @@ function loadJsPDF(callback) {
     if (window.jspdf) { callback(); return; }
     const s = document.createElement('script');
     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    s.onload  = callback;
+    s.onload = callback;
     s.onerror = () => console.warn('[PDF] Failed to load jsPDF CDN');
     document.head.appendChild(s);
 }
@@ -470,23 +470,23 @@ function loadJsPDF(callback) {
 function generateUserPDF(feedback) {
     loadJsPDF(() => {
         const { jsPDF } = window.jspdf;
-        const doc        = new jsPDF();
-        const margin     = 18;
-        const pageW      = doc.internal.pageSize.getWidth();
-        const maxW       = pageW - margin * 2;
-        const lineH      = 8;
-        let y            = 24;
+        const doc = new jsPDF();
+        const margin = 18;
+        const pageW = doc.internal.pageSize.getWidth();
+        const maxW = pageW - margin * 2;
+        const lineH = 8;
+        let y = 24;
 
         // Field label map (reuse same set as admin dashboard)
         const fieldLabels = {
             serviceType: 'Service Type', staffBehaviour: 'Staff Behaviour',
-            suggestions: 'Suggestions',  productQuality: 'Product Quality',
-            features: 'Features Used',   comments: 'Comments',
-            courseName: 'Course Name',   instructorName: 'Instructor Name',
+            suggestions: 'Suggestions', productQuality: 'Product Quality',
+            features: 'Features Used', comments: 'Comments',
+            courseName: 'Course Name', instructorName: 'Instructor Name',
             difficultyLevel: 'Difficulty Level', contentQuality: 'Content Quality',
-            feedback: 'Feedback',        eventName: 'Event Name',
-            eventType: 'Event Type',     organization: 'Organization Quality',
-            section: 'Website Section',  ease: 'Ease of Use'
+            feedback: 'Feedback', eventName: 'Event Name',
+            eventType: 'Event Type', organization: 'Organization Quality',
+            section: 'Website Section', ease: 'Ease of Use'
         };
 
         // Helper: add a line, create new page if needed
@@ -495,7 +495,7 @@ function generateUserPDF(feedback) {
                 doc.addPage(); y = 20;
             }
             if (isBold) doc.setFont('helvetica', 'bold');
-            else        doc.setFont('helvetica', 'normal');
+            else doc.setFont('helvetica', 'normal');
             doc.text(text, margin, y);
             y += lineH;
         }
@@ -522,18 +522,18 @@ function generateUserPDF(feedback) {
 
         // ── Core fields ──
         doc.setFontSize(11);
-        addLine(`Name   : ${feedback.name   || 'N/A'}`, false);
-        addLine(`Email  : ${feedback.email  || 'N/A'}`, false);
-        addLine(`Type   : ${feedback.type   || 'N/A'}`, false);
-        addLine(`Rating : ${feedback.rating || 0}/5`,   false);
-        addLine(`Date   : ${feedback.date   || 'N/A'}`, false);
+        addLine(`Name   : ${feedback.name || 'N/A'}`, false);
+        addLine(`Email  : ${feedback.email || 'N/A'}`, false);
+        addLine(`Type   : ${feedback.type || 'N/A'}`, false);
+        addLine(`Rating : ${feedback.rating || 0}/5`, false);
+        addLine(`Date   : ${feedback.date || 'N/A'}`, false);
         if (feedback.sentiment) {
             addLine(`Sentiment : ${feedback.sentiment}`, false);
         }
         y += 4;
 
         // ── Form-specific fields (with wrapping) ──
-        const SKIP = new Set(['name','email','type','rating','date','sentiment','_origIndex']);
+        const SKIP = new Set(['name', 'email', 'type', 'rating', 'date', 'sentiment', '_origIndex']);
         Object.keys(feedback).forEach(key => {
             if (SKIP.has(key)) return;
             const label = fieldLabels[key] || (key.charAt(0).toUpperCase() + key.slice(1));
@@ -564,7 +564,7 @@ function showDownloadButton(feedbackData, form) {
     if (prev) prev.remove();
 
     const btn = document.createElement('button');
-    btn.type      = 'button';
+    btn.type = 'button';
     btn.className = 'user-pdf-btn';
     btn.innerHTML = '📄 Download Your Response';
     btn.style.cssText = `
@@ -586,7 +586,7 @@ function showDownloadButton(feedbackData, form) {
 
     // Fade-in after one frame
     requestAnimationFrame(() => requestAnimationFrame(() => {
-        btn.style.opacity   = '1';
+        btn.style.opacity = '1';
         btn.style.transform = 'translateY(0)';
     }));
 }
@@ -656,8 +656,8 @@ function showThankYouMessage(name) {
     // Auto-dismiss after 3.5 s
     setTimeout(() => {
         toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        toast.style.opacity    = '0';
-        toast.style.transform  = 'translateX(-50%) translateY(-10px)';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-10px)';
         setTimeout(() => toast.remove(), 500);
     }, 3500);
 }
@@ -696,16 +696,16 @@ function ruleBasedSentiment(text) {
 
         if (POSITIVE_WORDS.includes(w)) {
             if (negated) neg++;   // "not good" → negative
-            else         pos++;
+            else pos++;
         }
         if (NEGATIVE_WORDS.includes(w)) {
             if (negated) pos++;   // "not bad" → positive
-            else         neg++;
+            else neg++;
         }
     });
 
-    if (pos > neg)  return "Positive";
-    if (neg > pos)  return "Negative";
+    if (pos > neg) return "Positive";
+    if (neg > pos) return "Negative";
     return "Neutral"; // equal or no matches → let API decide
 }
 
@@ -795,7 +795,7 @@ function renderAdminTable(data) {
 
         // Create data summary with proper labels
         // Excludes internal/meta fields that should not be displayed
-        const DISPLAY_SKIP = new Set(['type','date','rating','name','email','sentiment','_origIndex']);
+        const DISPLAY_SKIP = new Set(['type', 'date', 'rating', 'name', 'email', 'sentiment', '_origIndex']);
         let dataSummary = [];
         Object.keys(feedback).forEach(key => {
             if (DISPLAY_SKIP.has(key)) return;
@@ -807,10 +807,10 @@ function renderAdminTable(data) {
         const sentimentMap = {
             "Positive": { emoji: "\uD83D\uDE0A", cls: "sentiment-positive" },
             "Negative": { emoji: "\uD83D\uDE21", cls: "sentiment-negative" },
-            "Neutral":  { emoji: "\uD83D\uDE10", cls: "sentiment-neutral"  }
+            "Neutral": { emoji: "\uD83D\uDE10", cls: "sentiment-neutral" }
         };
         const sLabel = feedback.sentiment || "Neutral";
-        const sInfo  = sentimentMap[sLabel] || sentimentMap["Neutral"];
+        const sInfo = sentimentMap[sLabel] || sentimentMap["Neutral"];
 
         row.innerHTML = `
             <td style="text-align:center;">
@@ -870,7 +870,7 @@ function applyFilters() {
     // Tag each entry with its original localStorage index (needed by export checkboxes)
     const tagged = allFeedbacks.map((f, i) => ({ ...f, _origIndex: i }));
 
-    const dateVal   = document.getElementById("filterDate")   ? document.getElementById("filterDate").value   : "all";
+    const dateVal = document.getElementById("filterDate") ? document.getElementById("filterDate").value : "all";
     const ratingVal = document.getElementById("filterRating") ? document.getElementById("filterRating").value : "all";
     const searchVal = document.getElementById("filterSearch") ? document.getElementById("filterSearch").value.trim().toLowerCase() : "";
 
@@ -881,8 +881,8 @@ function applyFilters() {
         // ── Date Range Filter ──────────────────────────────────────────────
         // Uses parseFeedbackDate() to reliably handle toLocaleString() format
         if (dateVal !== "all") {
-            const days      = parseInt(dateVal);
-            const cutoff    = now - days * 24 * 60 * 60 * 1000;
+            const days = parseInt(dateVal);
+            const cutoff = now - days * 24 * 60 * 60 * 1000;
             const entryTime = parseFeedbackDate(f.date);
             if (isNaN(entryTime) || entryTime < cutoff) return false;
         }
@@ -922,15 +922,19 @@ function applyFilters() {
 
     // Refresh negative alert whenever the table re-renders
     checkNegativeFeedback();
+
+    // Refresh smart summary with the full (unfiltered) dataset so it always
+    // reflects the complete picture, regardless of active filter controls
+    generateSmartSummary(allFeedbacks);
 }
 
 // Resets all filter controls to defaults and re-renders the full table
 function resetFilters() {
-    const dateEl   = document.getElementById("filterDate");
+    const dateEl = document.getElementById("filterDate");
     const ratingEl = document.getElementById("filterRating");
     const searchEl = document.getElementById("filterSearch");
 
-    if (dateEl)   dateEl.value   = "all";
+    if (dateEl) dateEl.value = "all";
     if (ratingEl) ratingEl.value = "all";
     if (searchEl) searchEl.value = "";
 
@@ -940,13 +944,13 @@ function resetFilters() {
 
 /* ===== FILTER EVENT LISTENERS ===== */
 (function () {
-    const dateEl   = document.getElementById("filterDate");
+    const dateEl = document.getElementById("filterDate");
     const ratingEl = document.getElementById("filterRating");
     const searchEl = document.getElementById("filterSearch");
 
-    if (dateEl)   dateEl.addEventListener("change", applyFilters);
+    if (dateEl) dateEl.addEventListener("change", applyFilters);
     if (ratingEl) ratingEl.addEventListener("change", applyFilters);
-    if (searchEl) searchEl.addEventListener("input",  applyFilters);
+    if (searchEl) searchEl.addEventListener("input", applyFilters);
 
     // Initial render (replaces the old static render on page load)
     applyFilters();
@@ -1078,7 +1082,7 @@ if (selectAllCheckbox) {
 // Returns selected feedback entries, or ALL if none are checked
 function getSelectedFeedbacks() {
     const feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
-    const checked   = document.querySelectorAll(".row-select:checked");
+    const checked = document.querySelectorAll(".row-select:checked");
     if (checked.length === 0) return feedbacks;
     return Array.from(checked).map(cb => feedbacks[parseInt(cb.dataset.index)]);
 }
@@ -1089,19 +1093,19 @@ function exportCSV() {
     if (data.length === 0) { alert("No feedback data to export."); return; }
 
     const headers = ["Type", "Name", "Email", "Rating", "Date"];
-    const rows    = data.map(f => [
-        f.type   || "",
-        f.name   || "",
-        f.email  || "",
+    const rows = data.map(f => [
+        f.type || "",
+        f.name || "",
+        f.email || "",
         f.rating || "",
-        f.date   || ""
+        f.date || ""
     ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(","));
 
-    const csv  = [headers.join(","), ...rows].join("\n");
+    const csv = [headers.join(","), ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href     = url;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
     a.download = "feedbacks.csv";
     a.click();
     URL.revokeObjectURL(url);
@@ -1112,10 +1116,10 @@ function exportPDF() {
     const data = getSelectedFeedbacks();
     if (data.length === 0) { alert("No feedback data to export."); return; }
 
-    const { jsPDF }    = window.jspdf;
-    const doc          = new jsPDF();
-    const pageHeight   = doc.internal.pageSize.height;
-    const lineH        = 7;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.height;
+    const lineH = 7;
 
     // Title
     doc.setFontSize(18);
@@ -1136,10 +1140,10 @@ function exportPDF() {
 
         // Entry fields
         doc.setFont("helvetica", "normal");
-        doc.text(`Name   : ${f.name   || "N/A"}`, 18, y); y += lineH;
-        doc.text(`Email  : ${f.email  || "N/A"}`, 18, y); y += lineH;
-        doc.text(`Rating : ${f.rating || 0}/5`,   18, y); y += lineH;
-        doc.text(`Date   : ${f.date   || "N/A"}`, 18, y); y += lineH + 3;
+        doc.text(`Name   : ${f.name || "N/A"}`, 18, y); y += lineH;
+        doc.text(`Email  : ${f.email || "N/A"}`, 18, y); y += lineH;
+        doc.text(`Rating : ${f.rating || 0}/5`, 18, y); y += lineH;
+        doc.text(`Date   : ${f.date || "N/A"}`, 18, y); y += lineH + 3;
 
         // Separator line
         doc.setDrawColor(200, 200, 200);
@@ -1197,7 +1201,7 @@ function checkNegativeFeedback() {
     const titleEl = document.getElementById('negAlertTitle');
     if (!alertEl || !titleEl) return; // not on admin page
 
-    const feedbacks     = JSON.parse(localStorage.getItem('feedbacks')) || [];
+    const feedbacks = JSON.parse(localStorage.getItem('feedbacks')) || [];
     const negativeItems = feedbacks.filter(f =>
         parseInt(f.rating) <= 2 || f.sentiment === 'Negative'
     );
@@ -1218,15 +1222,15 @@ function checkNegativeFeedback() {
  */
 function viewNegativeIssues() {
     const allFeedbacks = JSON.parse(localStorage.getItem('feedbacks')) || [];
-    const negatives    = allFeedbacks
+    const negatives = allFeedbacks
         .map((f, i) => ({ ...f, _origIndex: i }))
         .filter(f => parseInt(f.rating) <= 2 || f.sentiment === 'Negative');
 
     // Reset filter controls to default so the label stays accurate
-    const dateEl   = document.getElementById('filterDate');
+    const dateEl = document.getElementById('filterDate');
     const ratingEl = document.getElementById('filterRating');
     const searchEl = document.getElementById('filterSearch');
-    if (dateEl)   dateEl.value   = 'all';
+    if (dateEl) dateEl.value = 'all';
     if (ratingEl) ratingEl.value = 'all';
     if (searchEl) searchEl.value = '';
 
@@ -1247,3 +1251,103 @@ function viewNegativeIssues() {
 }
 
 /* ==================================== */
+
+/* ===== SMART SUMMARY (MINI AI INSIGHT) ===== */
+function generateSmartSummary(feedbacks) {
+    const summaryBox = document.getElementById('smart-summary');
+    if (!summaryBox) return; // Not on admin page — exit silently
+
+    // ── Fallback: no data ──────────────────────────────────────────────────
+    if (!feedbacks || feedbacks.length === 0) {
+        summaryBox.style.borderLeftColor = 'var(--gray)';
+        summaryBox.innerHTML = `
+            <span class="summary-icon">📊</span>
+            <span class="summary-text">No feedback data available yet.</span>
+        `;
+        return;
+    }
+
+    // ── Single-pass aggregation ────────────────────────────────────────────
+    let pos = 0, neg = 0, neu = 0;
+    const KEYWORDS = [
+        'delivery', 'support', 'quality', 'price', 'staff',
+        'website', 'content', 'course', 'organization',
+        'features', 'speed', 'service', 'event', 'training'
+    ];
+    const kwCounts = {};
+
+    feedbacks.forEach(f => {
+        // Count sentiments
+        const s = (f.sentiment || 'Neutral').trim();
+        if (s === 'Positive') pos++;
+        else if (s === 'Negative') neg++;
+        else neu++;
+
+        // Scan all string values in this feedback object for keywords
+        Object.values(f).forEach(val => {
+            if (typeof val !== 'string') return;
+            const lower = val.toLowerCase();
+            KEYWORDS.forEach(kw => {
+                if (lower.includes(kw)) {
+                    kwCounts[kw] = (kwCounts[kw] || 0) + 1;
+                }
+            });
+        });
+    });
+
+    // ── Determine overall sentiment label ──────────────────────────────────
+    const total = feedbacks.length;
+    let overallLabel, icon, borderColor;
+
+    if (pos >= total * 0.5) {
+        overallLabel = 'happy overall';
+        icon         = '🌟';
+        borderColor  = '#2ecc71';
+    } else if (neg >= total * 0.5) {
+        overallLabel = 'mostly unhappy';
+        icon         = '⚠️';
+        borderColor  = '#e74c3c';
+    } else {
+        overallLabel = 'mixed opinions';
+        icon         = '💡';
+        borderColor  = '#f39c12';
+    }
+
+    // ── Find top keyword/topic ─────────────────────────────────────────────
+    let topTopic = '';
+    let maxCount = 0;
+    Object.entries(kwCounts).forEach(([kw, count]) => {
+        if (count > maxCount) { maxCount = count; topTopic = kw; }
+    });
+
+    // ── Build the insight sentence ─────────────────────────────────────────
+    let sentence;
+    const topicTag = topTopic
+        ? `<span class="summary-highlight">${topTopic}</span>`
+        : '';
+
+    if (overallLabel === 'happy overall') {
+        sentence = topTopic
+            ? `Users are happy overall, frequently praising ${topicTag}.`
+            : `Users are happy overall with their experience.`;
+    } else if (overallLabel === 'mostly unhappy') {
+        sentence = topTopic
+            ? `Users are mostly unhappy, especially regarding ${topicTag}.`
+            : `Users are mostly unhappy with their experience.`;
+    } else {
+        sentence = topTopic
+            ? `Users have mixed opinions, with prominent mentions of ${topicTag}.`
+            : `Users have mixed opinions across the board.`;
+    }
+
+    // ── Inject UI ──────────────────────────────────────────────────────────
+    summaryBox.style.borderLeftColor = borderColor;
+    summaryBox.innerHTML = `
+        <span class="summary-icon">${icon}</span>
+        <div class="summary-body">
+            <span class="summary-label">💡 Insight</span>
+            <span class="summary-text">${sentence}</span>
+        </div>
+    `;
+}
+/* =========================================== */
