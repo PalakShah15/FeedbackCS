@@ -926,6 +926,11 @@ function applyFilters() {
     // Refresh smart summary with the full (unfiltered) dataset so it always
     // reflects the complete picture, regardless of active filter controls
     generateSmartSummary(allFeedbacks);
+
+    // Refresh both charts with the full (unfiltered) dataset so they always
+    // reflect the complete picture regardless of active filter controls
+    renderSentimentChart(allFeedbacks);
+    renderFeedbackChart(allFeedbacks);
 }
 
 // Resets all filter controls to defaults and re-renders the full table
@@ -940,6 +945,16 @@ function resetFilters() {
 
     applyFilters();
 }
+
+
+/* ===== CHART INSTANCE VARIABLES ===== */
+// Declared here — BEFORE the IIFE that calls applyFilters() — so that
+// renderFeedbackChart() and renderSentimentChart() can reference them
+// without hitting the `let` Temporal Dead Zone (which causes a ReferenceError
+// and silently prevents both charts from rendering).
+let _feedbackChartInstance = null;
+let _sentimentChartInstance = null;
+/* ===================================== */
 
 
 /* ===== FILTER EVENT LISTENERS ===== */
@@ -959,40 +974,39 @@ function resetFilters() {
 
 
 
-/* ===== ADMIN CHART LOGIC ===== */
-const chartCanvas = document.getElementById("feedbackChart");
+/* ===== FEEDBACK BAR CHART ===== */
+function renderFeedbackChart(feedbacks) {
+    const canvas = document.getElementById('feedbackChart');
+    if (!canvas) return; // Not on admin page — exit silently
 
-if (chartCanvas) {
-    const feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+    // ── Destroy previous instance to prevent duplication ──────────────────
+    if (_feedbackChartInstance) {
+        _feedbackChartInstance.destroy();
+        _feedbackChartInstance = null;
+    }
 
-    const counts = {
-        Service: 0,
-        Product: 0,
-        Training: 0,
-        Event: 0,
-        Website: 0
-    };
+    // ── Empty state ───────────────────────────────────────────────────────
+    if (!feedbacks || feedbacks.length === 0) {
+        // Chart.js needs a fresh canvas after innerHTML changes, so just
+        // leave the blank canvas — the chart shows all-zero bars.
+        // Render a zero-bar chart so the layout stays consistent.
+    }
 
-    feedbacks.forEach(f => {
-        if (counts[f.type] !== undefined) {
-            counts[f.type]++;
-        }
+    // ── Aggregate counts by feedback type ─────────────────────────────────
+    const counts = { Service: 0, Product: 0, Training: 0, Event: 0, Website: 0 };
+    (feedbacks || []).forEach(f => {
+        if (counts[f.type] !== undefined) counts[f.type]++;
     });
 
-    new Chart(chartCanvas, {
-        type: "bar",
+    // ── Build bar chart ────────────────────────────────────────────────────
+    _feedbackChartInstance = new Chart(canvas, {
+        type: 'bar',
         data: {
             labels: Object.keys(counts),
             datasets: [{
-                label: "Number of Feedbacks",
+                label: 'Number of Feedbacks',
                 data: Object.values(counts),
-                backgroundColor: [
-                    '#4a63f3',
-                    '#f39c12',
-                    '#e74c3c',
-                    '#2ecc71',
-                    '#9b59b6'
-                ],
+                backgroundColor: ['#4a63f3', '#f39c12', '#e74c3c', '#2ecc71', '#9b59b6'],
                 borderRadius: 8,
                 borderWidth: 0
             }]
@@ -1000,31 +1014,22 @@ if (chartCanvas) {
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            animation: { duration: 500, easing: 'easeInOutQuart' },
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
+                legend: { display: true, position: 'top' },
                 title: {
                     display: true,
                     text: 'Feedback Distribution by Type',
-                    font: {
-                        size: 18,
-                        weight: 'bold'
-                    }
+                    font: { size: 18, weight: 'bold' }
                 }
             },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
             }
         }
     });
 }
+/* =============================== */
 
 
 /* ===== CLEAR FEEDBACK FUNCTION ===== */
@@ -1351,3 +1356,92 @@ function generateSmartSummary(feedbacks) {
     `;
 }
 /* =========================================== */
+
+
+/* ===== SENTIMENT PIE CHART ===== */
+function renderSentimentChart(feedbacks) {
+    const canvas = document.getElementById('sentimentChart');
+    if (!canvas) return; // Not on admin page — exit silently
+
+    // ── Destroy previous chart instance to avoid duplication ──────────────
+    if (_sentimentChartInstance) {
+        _sentimentChartInstance.destroy();
+        _sentimentChartInstance = null;
+    }
+
+    // ── Empty state ───────────────────────────────────────────────────────
+    if (!feedbacks || feedbacks.length === 0) {
+        // Show a plain message inside the container instead of a blank chart
+        const container = canvas.closest('.sentiment-chart-container');
+        if (container) {
+            container.innerHTML = `
+                <p class="sentiment-chart-empty">No sentiment data available yet.</p>
+            `;
+        }
+        return;
+    }
+
+    // ── Count sentiments in a single pass ─────────────────────────────────
+    let pos = 0, neu = 0, neg = 0;
+    feedbacks.forEach(f => {
+        const s = (f.sentiment || 'Neutral').trim();
+        if (s === 'Positive')      pos++;
+        else if (s === 'Negative') neg++;
+        else                       neu++;
+    });
+
+    // ── Build Chart.js pie chart ───────────────────────────────────────────
+    _sentimentChartInstance = new Chart(canvas, {
+        type: 'pie',
+        data: {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                data: [pos, neu, neg],
+                backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+                borderColor:     ['#16a34a', '#d97706', '#dc2626'],
+                borderWidth: 2,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            animation: {
+                animateRotate: true,
+                animateScale:  true,
+                duration: 600,
+                easing: 'easeInOutQuart'
+            },
+            plugins: {
+                legend: {
+                    display:  true,
+                    position: 'bottom',
+                    labels: {
+                        padding:   20,
+                        font:      { size: 13, weight: '600' },
+                        boxWidth:  14,
+                        boxHeight: 14
+                    }
+                },
+                title: {
+                    display: true,
+                    text:    'Sentiment Distribution',
+                    font:    { size: 16, weight: 'bold' },
+                    padding: { bottom: 16 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct   = total > 0
+                                ? ((ctx.parsed / total) * 100).toFixed(1)
+                                : 0;
+                            return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+/* ================================= */

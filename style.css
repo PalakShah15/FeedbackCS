@@ -490,6 +490,9 @@ button:active {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+    /* Ensure Chart.js always has a non-zero height to render into */
+    min-height: 300px;
+    position: relative;
 }
 
 /* ===== FOOTER ===== */
@@ -793,3 +796,40 @@ body.dark .summary-box {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 /* ============================== */
+
+/* ===== SENTIMENT PIE CHART ===== */
+
+/*
+  The pie chart container uses a fixed height and auto margin so the
+  chart centres itself. We NEVER apply max-width/max-height directly
+  to the <canvas> — Chart.js controls canvas dimensions via JS and
+  CSS overrides on the element itself will collapse or clip the chart.
+*/
+.sentiment-chart-container {
+    /* Remove the flex layout — it collapses canvas height to 0 */
+    display: block;
+    padding: 24px 30px;
+    /* Give Chart.js a real height to measure against */
+    height: 380px;
+    min-height: 380px;
+}
+
+/* Wrapper div written by JS around the canvas for the empty-state swap */
+.sentiment-chart-container canvas {
+    /* Let Chart.js manage all sizing — do NOT constrain with max-* here */
+    display: block;
+    margin: 0 auto;
+    /* Cap the visual width so the pie stays compact, NOT the canvas element */
+    max-width: 340px;
+}
+
+/* Empty-state message shown when no data exists */
+.sentiment-chart-empty {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--gray);
+    padding: 20px 0;
+    margin: 0;
+}
+/* ================================= */
