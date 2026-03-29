@@ -1445,3 +1445,62 @@ function renderSentimentChart(feedbacks) {
     });
 }
 /* ================================= */
+
+
+/* ===== SMART DYNAMIC PLACEHOLDER ===== */
+(function initSmartPlaceholders() {
+
+    const PLACEHOLDER_POOL = [
+        "Tell us what you loved ❤️",
+        "What can we improve?",
+        "Be honest, we're listening 👀",
+        "Share your experience with us ✍️",
+        "Your feedback matters a lot 💬"
+    ];
+
+    // Default shown when textarea is empty and loses focus
+    const DEFAULT_PLACEHOLDER = "Write your feedback here...";
+
+    function pickRandom(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function attachSmartPlaceholder(textarea) {
+        // Store the placeholder that was in the HTML (could be blank/empty)
+        // We fall back to DEFAULT_PLACEHOLDER if none was set.
+        const originalPlaceholder =
+            textarea.getAttribute('placeholder') || DEFAULT_PLACEHOLDER;
+
+        // Set the default on first load so the field always shows something
+        textarea.setAttribute('placeholder', originalPlaceholder);
+
+        textarea.addEventListener('focus', function () {
+            // Only swap the placeholder when the field is empty (no typed text)
+            if (!this.value.trim()) {
+                // Brief opacity dip via class, then swap text
+                this.classList.add('ph-fade');
+                setTimeout(() => {
+                    this.setAttribute('placeholder', pickRandom(PLACEHOLDER_POOL));
+                    this.classList.remove('ph-fade');
+                }, 120);
+            }
+        });
+
+        textarea.addEventListener('blur', function () {
+            // If the user left the textarea empty, restore the original placeholder
+            if (!this.value.trim()) {
+                this.classList.add('ph-fade');
+                setTimeout(() => {
+                    this.setAttribute('placeholder', originalPlaceholder);
+                    this.classList.remove('ph-fade');
+                }, 120);
+            }
+            // If they typed something, leave it completely alone
+        });
+    }
+
+    // Attach to every textarea inside a feedback form (all pages share script.js)
+    document.querySelectorAll('.feedback-form textarea').forEach(attachSmartPlaceholder);
+
+})();
+/* ======================================= */
