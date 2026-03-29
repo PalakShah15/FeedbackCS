@@ -163,6 +163,14 @@ document.querySelectorAll(".feedback-form").forEach(form => {
     // Disable HTML5 validation to use custom validation
     form.setAttribute('novalidate', 'novalidate');
 
+    // ── Timer Logic: Start on first interaction ──
+    let startTime = null;
+    const startTimer = () => {
+        if (!startTime) startTime = Date.now();
+    };
+    form.addEventListener('input', startTimer);
+    form.addEventListener('focusin', startTimer);
+
     // Add real-time validation on email input
     form.querySelectorAll("input[type='email']").forEach(emailInput => {
         emailInput.addEventListener('blur', function () {
@@ -424,8 +432,19 @@ document.querySelectorAll(".feedback-form").forEach(form => {
             // Store last submission for user PDF download
             lastSubmittedFeedback = data;
 
-            // Show personalised thank-you toast (name already captured in data.name)
-            showThankYouMessage(data.name);
+            // ── Timer Logic: Calculate time taken ──
+            let timeMessage = "";
+            if (startTime) {
+                const timeTakenSec = Math.max(1, Math.floor((Date.now() - startTime) / 1000));
+                const timeStr = timeTakenSec < 60
+                    ? `${timeTakenSec} seconds`
+                    : `${Math.floor(timeTakenSec / 60)} min ${timeTakenSec % 60} sec`;
+                timeMessage = `You completed this in ${timeStr}!`;
+                startTime = null; // Reset for next submission
+            }
+
+            // Show personalised thank-you toast with optional time tracking message
+            showThankYouMessage(data.name, timeMessage);
 
             // Show download button near the submit button
             showDownloadButton(data, form);
@@ -639,7 +658,7 @@ function showDownloadButton(feedbackData, form) {
     document.head.appendChild(s);
 })();
 
-function showThankYouMessage(name) {
+function showThankYouMessage(name, timeMessage = "") {
     const displayName = (name && name.trim()) ? name.trim() : null;
     const mainText = displayName
         ? `🙌 Thanks, ${displayName}! Your feedback really helps us improve.`
@@ -650,6 +669,7 @@ function showThankYouMessage(name) {
     toast.innerHTML = `
         <span class="ty-main">${mainText}</span>
         <span class="ty-sub">We appreciate you taking the time ❤️</span>
+        ${timeMessage ? `<span class="ty-sub" style="margin-top:6px; font-weight:600; color:#e0f2fe; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 6px;">⏱️ ${timeMessage}</span>` : ''}
     `;
     document.body.appendChild(toast);
 
