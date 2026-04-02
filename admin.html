@@ -12,107 +12,110 @@
         /* ===== FILTER BAR ===== */
         .filter-bar {
             display: flex;
-            gap: 12px;
+            gap: 16px;
             flex-wrap: wrap;
             align-items: center;
             background: var(--card);
-            border-radius: 14px;
-            padding: 18px 20px;
-            margin-bottom: 22px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 28px;
+            box-shadow: var(--card-shadow);
         }
         .filter-bar select,
         .filter-bar input[type="text"] {
             flex: 1;
             min-width: 160px;
-            padding: 10px 14px;
+            padding: 12px 16px;
             border-radius: 10px;
-            border: 2px solid #e0e0e0;
-            background: var(--card);
+            border: 1.5px solid #d1ddd8;
+            background: var(--accent);
             color: var(--text);
             font-size: 14px;
             font-family: inherit;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
             margin-bottom: 0;
         }
         .filter-bar select:focus,
         .filter-bar input[type="text"]:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(74,99,243,0.1);
+            background: white;
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
         .filter-bar label {
             font-size: 13px;
-            font-weight: 600;
-            color: var(--gray);
+            font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 0;
             white-space: nowrap;
         }
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
             flex: 1;
             min-width: 160px;
         }
         #filterResultCount {
             font-size: 13px;
-            color: var(--gray);
+            font-weight: 500;
+            color: var(--text-muted);
             white-space: nowrap;
             align-self: flex-end;
-            padding-bottom: 2px;
+            padding-bottom: 5px;
         }
         /* ===== SENTIMENT CLASSES ===== */
-        .sentiment-positive { color: #22c55e; font-weight: 700; }
-        .sentiment-neutral  { color: #f59e0b; font-weight: 700; }
-        .sentiment-negative { color: #ef4444; font-weight: 700; }
+        .sentiment-positive { color: #5e8b7e; font-weight: 700; }
+        .sentiment-neutral  { color: #e8a838; font-weight: 700; }
+        .sentiment-negative { color: #d95550; font-weight: 700; }
 
         /* ===== NEGATIVE ALERT ===== */
         .neg-alert {
             display: none;
             align-items: flex-start;
-            gap: 14px;
-            background: linear-gradient(135deg, #fff0f0 0%, #ffe5e5 100%);
-            border: 1.5px solid #f5a0a0;
-            border-left: 5px solid #e74c3c;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 18px rgba(231, 76, 60, 0.12);
-            animation: negAlertIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            gap: 16px;
+            background: rgba(217, 85, 80, 0.06);
+            border: 1px solid rgba(217, 85, 80, 0.18);
+            border-left: 5px solid var(--danger);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 20px rgba(217, 85, 80, 0.08);
+            animation: negAlertIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
         .neg-alert.show { display: flex; }
         @keyframes negAlertIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
         .neg-alert .na-icon  { font-size: 26px; line-height: 1; flex-shrink: 0; }
         .neg-alert .na-body  { flex: 1; }
         .neg-alert .na-title {
             font-size: 15px;
-            font-weight: 700;
-            color: #c0392b;
-            margin-bottom: 3px;
+            font-weight: 800;
+            color: var(--danger);
+            margin-bottom: 4px;
         }
-        .neg-alert .na-sub   { font-size: 13px; color: #7f1d1d; margin-bottom: 10px; }
+        .neg-alert .na-sub   { font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px; }
         .neg-alert .na-btn {
             display: inline-block;
-            padding: 6px 16px;
-            background: #e74c3c;
+            padding: 8px 18px;
+            background: var(--danger);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
             margin: 0;
             width: auto;
+            box-shadow: 0 4px 12px rgba(217, 85, 80, 0.25);
         }
         .neg-alert .na-btn:hover {
-            background: #c0392b;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(192,57,43,0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(217, 85, 80, 0.35);
         }
     </style>
 </head>
@@ -229,7 +232,7 @@
             <span id="filterResultCount"></span>
             <button onclick="resetFilters()"
                 style="width:auto; padding:10px 18px; font-size:13px; margin-top:0;
-                       background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+                       background: linear-gradient(135deg, #a7c4bc 0%, #8bb0a5 100%);
                        align-self:flex-end;">
                 🔄 Reset Filters
             </button>
@@ -241,7 +244,7 @@
                 <tr>
                     <th style="width:44px; text-align:center;">
                         <input type="checkbox" id="selectAll" title="Select All"
-                            style="transform:scale(1.2); cursor:pointer; accent-color:#4a63f3;">
+                            style="transform:scale(1.2); cursor:pointer; accent-color:#5e8b7e;">
                     </th>
                     <th>Type</th>
                     <th>Name</th>
@@ -257,19 +260,24 @@
 
         <div style="display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;">
             <button onclick="exportCSV()"
-                style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);">
+                style="background: linear-gradient(135deg, #5e8b7e 0%, #4a7567 100%);">
                 📥 Export as CSV
             </button>
             <button onclick="exportPDF()"
-                style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">
+                style="background: linear-gradient(135deg, #7c9a92 0%, #5e8b7e 100%);">
                 📄 Download as PDF
             </button>
             <button onclick="clearFeedback()"
-                style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                style="background: linear-gradient(135deg, #d95550 0%, #c0392b 100%);">
                 🗑️ Clear All Feedback
             </button>
         </div>
     </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <p style="font-size: 15px;">© 2026 Cyber Flames | Feedback Collection System</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

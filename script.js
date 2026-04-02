@@ -6,6 +6,8 @@ function closeNav() {
     document.getElementById("sideNav").style.width = "0";
 }
 
+
+
 /* ===== DARK MODE ===== */
 const toggle = document.getElementById("themeToggle");
 
@@ -40,8 +42,8 @@ if (toggle) {
             margin: 6px 0 12px;
             padding: 10px 16px;
             border-radius: 10px;
-            background: rgba(74, 99, 243, 0.07);
-            border-left: 4px solid var(--primary, #4a63f3);
+            background: rgba(94, 139, 126, 0.07);
+            border-left: 4px solid var(--primary, #5e8b7e);
             opacity: 0;
             transform: translateY(-6px);
             transition: opacity 0.35s ease, transform 0.35s ease;
@@ -461,6 +463,11 @@ document.querySelectorAll(".feedback-form").forEach(form => {
                 });
             }
 
+            // Reset emoji reaction containers
+            form.querySelectorAll('.emoji-reaction').forEach(el => {
+                el.classList.remove('show');
+            });
+
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -588,7 +595,7 @@ function showDownloadButton(feedbackData, form) {
     btn.innerHTML = '📄 Download Your Response';
     btn.style.cssText = `
         margin-top: 12px;
-        background: linear-gradient(135deg, #4a63f3 0%, #3651d4 100%);
+        background: linear-gradient(135deg, #5e8b7e 0%, #4a7567 100%);
         opacity: 0;
         transform: translateY(8px);
         transition: opacity 0.4s ease, transform 0.4s ease;
@@ -795,7 +802,7 @@ function renderAdminTable(data) {
     if (data.length === 0) {
         adminTableBody.innerHTML = `
             <tr>
-                <td colspan="7" style="text-align:center; padding:20px; color:#999;">
+                <td colspan="8" style="text-align:center; padding:20px; color:#999;">
                     No feedback found
                 </td>
             </tr>
@@ -849,9 +856,9 @@ function renderAdminTable(data) {
         row.innerHTML = `
             <td style="text-align:center;">
                 <input type="checkbox" class="row-select" data-index="${feedback._origIndex}"
-                    style="transform:scale(1.2); cursor:pointer; accent-color:#4a63f3;">
+                    style="transform:scale(1.2); cursor:pointer; accent-color:#5e8b7e;">
             </td>
-            <td style="font-weight:600; color:#4a63f3;">${feedback.type}</td>
+            <td style="font-weight:600; color:#5e8b7e;">${feedback.type}</td>
             <td style="font-weight:500;">${feedback.name || 'N/A'}</td>
             <td style="font-size:14px;">${feedback.email || 'N/A'}</td>
             <td style="max-width:350px; font-size:13px; line-height:1.6;">${dataSummary.join('<br>') || 'N/A'}</td>
@@ -1051,7 +1058,7 @@ function renderFeedbackChart(feedbacks) {
             datasets: [{
                 label: 'Number of Feedbacks',
                 data: Object.values(counts),
-                backgroundColor: ['#4a63f3', '#f39c12', '#e74c3c', '#2ecc71', '#9b59b6'],
+                backgroundColor: ['#5e8b7e', '#e8a838', '#d95550', '#a7c4bc', '#7c9a92'],
                 borderRadius: 8,
                 borderWidth: 0
             }]

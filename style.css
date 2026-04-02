@@ -4,115 +4,129 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
+    cursor: default;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    cursor: text;
 }
 
 /* ===== THEME VARIABLES ===== */
 :root {
-    --bg: #f4f7fb;
-    --card: #ffffff;
-    --text: #2c3e50;
-    --primary: #4a63f3;
-    --primary-dark: #3651d4;
-    --success: #2ecc71;
-    --danger: #e74c3c;
-    --warning: #f39c12;
-    --gray: #95a5a6;
+    --bg: #f8f9fa;
+    --bg-grad: linear-gradient(135deg, #f8f9fa 0%, #f2e9e4 50%, #e8ede9 100%);
+    --card: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(167, 196, 188, 0.25);
+    --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    --text: #1f2933;
+    --text-muted: #6b7280;
+    --primary: #5e8b7e;
+    --primary-dark: #4a7567;
+    --primary-glow: rgba(94, 139, 126, 0.15);
+    --secondary: #a7c4bc;
+    --accent: #f2e9e4;
+    --success: #5e8b7e;
+    --danger: #d95550;
+    --warning: #e8a838;
+    --gray: #94a3b8;
 }
 
 body.dark {
-    --bg: #0f0f1e;
-    --card: #1a1a2e;
-    --text: #eaeaea;
-    --primary: #5a73ff;
-    --primary-dark: #4a63f3;
+    --bg: #1a2332;
+    --bg-grad: linear-gradient(135deg, #131b27 0%, #1a2332 50%, #1e2a3a 100%);
+    --card: rgba(30, 42, 58, 0.85);
+    --card-border: rgba(167, 196, 188, 0.1);
+    --card-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    --text: #f0f4f0;
+    --text-muted: #94a3b8;
+    --primary: #8bb5a8;
+    --primary-dark: #6e9c8e;
+    --primary-glow: rgba(139, 181, 168, 0.2);
+    --secondary: #6e9c8e;
+    --accent: #2a3545;
 }
 
 body {
-    background: var(--bg);
+    background: var(--bg-grad);
     color: var(--text);
     min-height: 100vh;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.4s ease, color 0.4s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
 }
 
-/* ===== NAVBAR =====  */
+
+
+/* ===== NAVBAR ===== */
 .navbar {
-    height: 70px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    height: 68px;
     color: white;
+    background-color: #5e8b7e;
+    /*background: var(--card);*/
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    color: var(--text);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 40px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
     position: sticky;
     top: 0;
     z-index: 1000;
 }
 
 .brand {
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 800;
-    letter-spacing: 0.5px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
+    color: white;
+    text-shadow: none;
 }
 
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 6px;
     white-space: nowrap;
 }
 
 .nav-link {
     display: inline-flex;
     align-items: center;
-    font-size: 18.5px;
+    font-size: 14.5px;
     font-weight: 600;
-    color: white;
+    color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
     line-height: 1;
-    padding: 8px 4px;
-    margin: 0;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 4px;
-    right: 4px;
-    width: calc(100% - 8px);
-    height: 3px;
-    background: white;
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
+    padding: 10px 16px;
+    border-radius: 10px;
+    transition: all 0.25s ease;
 }
 
 .nav-link:hover {
-    transform: translateY(-2px);
+    color: white;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
 }
 
-.nav-link:hover::after {
-    transform: scaleX(1);
+.nav-link::after {
+    display: none;
 }
-
-/*.nav-link:hover:last-child{
-    color:#ff4d4d;
-}*/
 
 .nav-separator {
-    margin: 0 18px;
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: 300;
-    user-select: none;
+    display: none;
 }
 
 /* ===== HAMBURGER ===== */
 .hamburger {
-    width: 32px;
-    height: 24px;
+    width: 30px;
+    height: 22px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -121,15 +135,15 @@ body {
 }
 
 .hamburger span {
-    height: 4px;
+    height: 3px;
     width: 100%;
-    background: white;
+    background: rgba(255, 255, 255, 0.85);
     border-radius: 4px;
     transition: 0.3s;
 }
 
 .hamburger:hover span {
-    background: rgba(255, 255, 255, 0.8);
+    background: white;
 }
 
 /* ===== SIDE NAV ===== */
@@ -139,52 +153,59 @@ body {
     position: fixed;
     top: 0;
     right: 0;
-    background: linear-gradient(135deg, #2f3542 0%, #1e2126 100%);
+    background: var(--card);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-left: 1px solid var(--card-border);
     overflow-x: hidden;
-    transition: 0.4s;
-    padding-top: 60px;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-top: 80px;
     z-index: 9999;
-    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.08);
 }
 
 .sidenav a {
-    padding: 18px 30px;
+    padding: 16px 30px;
     text-decoration: none;
-    font-size: 18px;
-    color: #f1f1f1;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-muted);
     display: block;
     transition: 0.3s;
     border-left: 4px solid transparent;
 }
 
 .sidenav a:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--primary-glow);
+    color: var(--primary);
     border-left-color: var(--primary);
-    padding-left: 35px;
+    padding-left: 36px;
 }
 
 .closebtn {
     position: absolute;
     top: 15px;
     left: 25px;
-    font-size: 40px;
+    font-size: 36px;
     cursor: pointer;
-    color: white;
-    transition: transform 0.3s ease;
+    color: var(--text-muted);
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .closebtn:hover {
     transform: rotate(90deg);
+    color: var(--danger);
 }
 
 /* ===== HERO SECTION ===== */
 .hero {
     min-height: calc(100vh - 140px);
-    background: linear-gradient(135deg, rgba(88, 110, 234, 0.9) 0%, rgba(71, 88, 202, 0.9) 100%),
-        url("https://i.pinimg.com/736x/9b/f3/80/9bf380e08b5d18ba2215cb7dd5139e03.jpg");
+    background:
+        linear-gradient(135deg, rgba(248, 249, 250, 0.75) 0%, rgba(242, 233, 228, 0.7) 100%),
+        url("hero-bg.png");
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -192,29 +213,32 @@ body {
 }
 
 .hero-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     padding: 60px 50px;
     max-width: 700px;
     width: 90%;
-    border-radius: 25px;
+    border-radius: 20px;
     text-align: center;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: fadeInUp 0.8s ease;
-    backdrop-filter: blur(10px);
 }
 
 .hero-card h1 {
-    font-size: 48px;
+    font-size: 46px;
     margin-bottom: 20px;
-    color: var(--primary);
+    color: var(--text);
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.15;
+    letter-spacing: -1px;
 }
 
 .hero-card p {
-    font-size: 20px;
-    color: #555;
-    line-height: 1.6;
+    font-size: 18px;
+    color: var(--text-muted);
+    line-height: 1.7;
 }
 
 /* ===== DARK MODE TOGGLE ===== */
@@ -222,8 +246,8 @@ body {
     position: fixed;
     top: 85px;
     right: 20px;
-    width: 45px;
-    height: 45px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--card);
     color: var(--text);
@@ -231,15 +255,16 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
     z-index: 100;
     transition: all 0.3s ease;
     font-size: 20px;
+    border: 1px solid var(--card-border);
 }
 
 .theme-toggle:hover {
     transform: scale(1.1) rotate(20deg);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* ===== FORM CONTAINER ===== */
@@ -247,18 +272,22 @@ body {
     max-width: 600px;
     margin: 60px auto 40px;
     background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
     padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
     animation: fadeInUp 0.6s ease;
 }
 
 .form-container h2 {
     text-align: center;
     margin-bottom: 30px;
-    font-size: 32px;
-    color: var(--primary);
-    font-weight: 700;
+    font-size: 28px;
+    color: var(--text);
+    font-weight: 800;
+    letter-spacing: -0.3px;
 }
 
 /* ===== FORM ELEMENTS ===== */
@@ -267,7 +296,7 @@ label {
     display: block;
     margin-bottom: 8px;
     color: var(--text);
-    font-size: 15px;
+    font-size: 14px;
 }
 
 input[type="text"],
@@ -275,11 +304,11 @@ input[type="email"],
 select,
 textarea {
     width: 100%;
-    padding: 12px 15px;
+    padding: 13px 16px;
     margin-bottom: 8px;
     border-radius: 10px;
-    border: 2px solid #e0e0e0;
-    background: var(--card);
+    border: 1.5px solid #d1ddd8;
+    background: var(--accent);
     color: var(--text);
     font-size: 15px;
     transition: all 0.3s ease;
@@ -291,7 +320,8 @@ select:focus,
 textarea:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(74, 99, 243, 0.1);
+    background: var(--card);
+    box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 /* Error state for inputs */
@@ -299,8 +329,8 @@ input[type="text"].error-input,
 input[type="email"].error-input,
 select.error-input,
 textarea.error-input {
-    border-color: #e74c3c !important;
-    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 4px rgba(217, 85, 80, 0.12);
 }
 
 textarea {
@@ -312,7 +342,7 @@ textarea {
 /* ===== ERROR MESSAGES ===== */
 .error {
     display: block;
-    color: #e74c3c;
+    color: var(--danger);
     font-size: 13px;
     margin-top: 4px;
     margin-bottom: 15px;
@@ -322,10 +352,10 @@ textarea {
 }
 
 .error:not(:empty) {
-    padding: 6px 10px;
-    background: rgba(231, 76, 60, 0.1);
-    border-radius: 6px;
-    border-left: 3px solid #e74c3c;
+    padding: 8px 12px;
+    background: rgba(217, 85, 80, 0.08);
+    border-radius: 8px;
+    border-left: 3px solid var(--danger);
 }
 
 @keyframes errorShake {
@@ -348,7 +378,7 @@ textarea {
 .section-label {
     font-weight: 600;
     margin-bottom: 12px;
-    margin-top: 20px;
+    margin-top: 24px;
     display: block;
     color: var(--text);
     font-size: 15px;
@@ -358,7 +388,7 @@ textarea {
 .option-group {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 8px;
 }
 
@@ -366,14 +396,17 @@ textarea {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px;
-    border-radius: 8px;
-    transition: background 0.2s ease;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: all 0.25s ease;
     cursor: pointer;
 }
 
 .option-row:hover {
-    background: rgba(74, 99, 243, 0.05);
+    background: var(--primary-glow);
+    border-color: rgba(94, 139, 126, 0.15);
+    transform: translateX(2px);
 }
 
 .option-row input[type="radio"],
@@ -406,8 +439,8 @@ textarea {
 .stars span {
     font-size: 36px;
     cursor: pointer;
-    color: #ddd;
-    transition: all 0.2s ease;
+    color: #d1ddd8;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-block;
     user-select: none;
 }
@@ -419,63 +452,85 @@ textarea {
 /* ===== BUTTONS ===== */
 button {
     width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 15px;
+    background: linear-gradient(135deg, #5e8b7e 0%, #4a7567 100%);
     color: white;
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    margin-top: 20px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(74, 99, 243, 0.3);
+    margin-top: 24px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 16px rgba(94, 139, 126, 0.25);
 }
 
 button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 99, 243, 0.4);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 10px 24px rgba(94, 139, 126, 0.35);
 }
 
 button:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.99);
+    box-shadow: 0 2px 8px rgba(94, 139, 126, 0.2);
+    transition-duration: 0.08s;
+}
+
+/* Disabled state */
+button:disabled {
+    transform: none !important;
+    box-shadow: none !important;
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* ===== ADMIN TABLE ===== */
 .admin-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     margin: 30px 0;
     background: var(--card);
-    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--card-shadow);
 }
 
 .admin-table thead {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
+    background: linear-gradient(135deg, rgba(94, 139, 126, 0.08), rgba(167, 196, 188, 0.12));
 }
 
 .admin-table th {
-    padding: 16px;
+    padding: 16px 18px;
     text-align: left;
-    font-weight: 600;
-    font-size: 15px;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--primary);
+    border-bottom: 2px solid var(--card-border);
 }
 
 .admin-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--card-border);
     font-size: 14px;
+    color: var(--text);
+    transition: background 0.3s ease;
+}
+
+/* Zebra striping */
+.admin-table tbody tr:nth-child(even) td {
+    background: rgba(94, 139, 126, 0.03);
 }
 
 .admin-table tbody tr {
-    transition: background 0.2s ease;
+    transition: all 0.25s ease;
 }
 
-.admin-table tbody tr:hover {
-    background: rgba(74, 99, 243, 0.05);
+.admin-table tbody tr:hover td {
+    background: var(--primary-glow);
 }
 
 .admin-table tbody tr:last-child td {
@@ -485,19 +540,25 @@ button:active {
 /* ===== CHART CONTAINER ===== */
 .chart-container {
     max-width: 100%;
-    margin: 30px 0;
+    margin: 24px 0;
     background: var(--card);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
-    /* Ensure Chart.js always has a non-zero height to render into */
+    border: 1px solid var(--card-border);
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
     min-height: 300px;
     position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chart-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
 }
 
 /* ===== FOOTER ===== */
 footer {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, #5e8b7e 0%, #4a7567 100%);
     color: white;
     text-align: center;
     padding: 20px;
@@ -509,7 +570,7 @@ footer {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(24px);
     }
 
     to {
@@ -535,7 +596,7 @@ footer {
     }
 
     .brand {
-        font-size: 20px;
+        font-size: 19px;
     }
 
     .nav-links {
@@ -547,30 +608,30 @@ footer {
     }
 
     .hero-card {
-        padding: 40px 30px;
+        padding: 40px 28px;
         width: 95%;
     }
 
     .hero-card h1 {
-        font-size: 32px;
+        font-size: 30px;
     }
 
     .hero-card p {
-        font-size: 16px;
+        font-size: 15px;
     }
 
     .form-container {
-        margin: 40px 20px;
-        padding: 30px 25px;
+        margin: 40px 16px;
+        padding: 28px 22px;
     }
 
     .form-container h2 {
-        font-size: 26px;
+        font-size: 24px;
     }
 
     .theme-toggle {
-        top: 80px;
-        right: 15px;
+        top: 78px;
+        right: 14px;
         width: 40px;
         height: 40px;
     }
@@ -587,7 +648,7 @@ footer {
 
 @media (max-width: 480px) {
     .hero-card h1 {
-        font-size: 26px;
+        font-size: 24px;
     }
 
     .hero-card p {
@@ -599,7 +660,7 @@ footer {
     }
 
     .form-container {
-        padding: 25px 20px;
+        padding: 22px 18px;
     }
 }
 
@@ -624,17 +685,18 @@ html {
     width: 100%;
     padding: 14px;
     margin: 12px 0;
-    border-radius: 12px;
-    border: 2px solid transparent;
-    background: #f5f7ff;
+    border-radius: 10px;
+    border: 1.5px solid #d1ddd8;
+    background: var(--accent);
     font-size: 16px;
     transition: 0.3s;
 }
 
 .login-input:focus {
-    border: 2px solid #4a63f3;
+    border-color: var(--primary);
     background: white;
     outline: none;
+    box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 
@@ -652,22 +714,14 @@ button {
 }
 
 button:hover {
-    transform: translateY(-4px) scale(1.015);
-    box-shadow: 0 10px 28px rgba(74, 99, 243, 0.45);
+    transform: translateY(-3px) scale(1.015);
+    box-shadow: 0 10px 24px rgba(94, 139, 126, 0.35);
 }
 
 button:active {
     transform: translateY(1px) scale(0.98);
-    box-shadow: 0 2px 8px rgba(74, 99, 243, 0.25);
+    box-shadow: 0 2px 8px rgba(94, 139, 126, 0.2);
     transition-duration: 0.08s;
-}
-
-/* Disabled state — no lift */
-button:disabled {
-    transform: none !important;
-    box-shadow: none !important;
-    opacity: 0.6;
-    cursor: not-allowed;
 }
 
 /* ── Star: hover glow + click bounce ── */
@@ -698,7 +752,7 @@ button:disabled {
 
 .stars span:hover {
     transform: scale(1.25);
-    filter: drop-shadow(0 0 6px rgba(255, 200, 0, 0.6));
+    filter: drop-shadow(0 0 6px rgba(255, 200, 0, 0.5));
 }
 
 /* Triggered by JS on click: adds then removes this class */
@@ -724,11 +778,11 @@ textarea:focus {
 
 /* ── Nav links: smoother hover ── */
 .nav-link {
-    transition: color 0.2s ease, transform 0.2s ease;
+    transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }
 
 .nav-link:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 /* ── Theme toggle: smoother spring spin ── */
@@ -739,7 +793,7 @@ textarea:focus {
 
 .theme-toggle:hover {
     transform: scale(1.15) rotate(22deg);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 /* ── Reduce motion: respect user preference ── */
@@ -759,10 +813,10 @@ textarea:focus {
     align-items: center;
     gap: 14px;
     background: var(--card);
-    padding: 16px 20px;
-    border-radius: 12px;
-    margin: 0 0 22px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+    padding: 18px 22px;
+    border-radius: 14px;
+    margin: 0 0 24px;
+    box-shadow: var(--card-shadow);
     border-left: 5px solid var(--primary);
     transition: border-color 0.4s ease, background 0.3s ease;
     animation: fadeInUp 0.5s ease both;
@@ -799,7 +853,7 @@ textarea:focus {
     font-weight: 700;
     color: var(--primary);
     text-transform: capitalize;
-    background: rgba(74, 99, 243, 0.08);
+    background: var(--primary-glow);
     padding: 1px 7px;
     border-radius: 5px;
 }
@@ -812,27 +866,16 @@ body.dark .summary-box {
 
 /* ===== SENTIMENT PIE CHART ===== */
 
-/*
-  The pie chart container uses a fixed height and auto margin so the
-  chart centres itself. We NEVER apply max-width/max-height directly
-  to the <canvas> — Chart.js controls canvas dimensions via JS and
-  CSS overrides on the element itself will collapse or clip the chart.
-*/
 .sentiment-chart-container {
-    /* Remove the flex layout — it collapses canvas height to 0 */
     display: block;
     padding: 24px 30px;
-    /* Give Chart.js a real height to measure against */
     height: 380px;
     min-height: 380px;
 }
 
-/* Wrapper div written by JS around the canvas for the empty-state swap */
 .sentiment-chart-container canvas {
-    /* Let Chart.js manage all sizing — do NOT constrain with max-* here */
     display: block;
     margin: 0 auto;
-    /* Cap the visual width so the pie stays compact, NOT the canvas element */
     max-width: 340px;
 }
 
@@ -850,13 +893,11 @@ body.dark .summary-box {
 
 /* ===== SMART DYNAMIC PLACEHOLDER ===== */
 
-/* Smooth fade for placeholder text changes */
 .feedback-form textarea::placeholder {
     transition: opacity 0.15s ease;
     opacity: 1;
 }
 
-/* JS adds this class momentarily during the swap to create a fade effect */
 .feedback-form textarea.ph-fade::placeholder {
     opacity: 0;
 }
