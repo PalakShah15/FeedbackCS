@@ -1058,7 +1058,7 @@ function renderFeedbackChart(feedbacks) {
             datasets: [{
                 label: 'Number of Feedbacks',
                 data: Object.values(counts),
-                backgroundColor: ['#5e8b7e', '#e8a838', '#d95550', '#a7c4bc', '#7c9a92'],
+                backgroundColor: ['#4f46e5', '#f59e0b', '#ef4444', '#818cf8', '#6366f1'],
                 borderRadius: 8,
                 borderWidth: 0
             }]
