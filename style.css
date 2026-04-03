@@ -201,7 +201,7 @@ body {
 .hero {
     min-height: calc(100vh - 140px);
     background:
-        linear-gradient(135deg, rgba(248, 250, 255, 0.8) 0%, rgba(238, 242, 255, 0.8) 100%),
+        linear-gradient(135deg, rgba(88, 86, 214, 0.82) 0%, rgba(79, 70, 229, 0.65) 100%),
         url("hero-bg.png");
     background-size: cover;
     background-position: center;
@@ -213,17 +213,25 @@ body {
 }
 
 .hero-card {
-    background: var(--card);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 60px 50px;
     max-width: 700px;
     width: 90%;
     border-radius: 20px;
     text-align: center;
     animation: fadeInUp 0.8s ease;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.35s ease;
+    cursor: default;
+}
+
+.hero-card:hover {
+    transform: translateY(-8px) scale(1.015);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22), 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .hero-card h1 {
